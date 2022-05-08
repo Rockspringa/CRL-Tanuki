@@ -1,4 +1,7 @@
-class CrlDouble extends CrlNumber implements CrlType {
+import { CrlInt, CrlNumber, CrlString, CrlType, Type } from "./";
+
+export class CrlDouble extends CrlNumber implements CrlType {
+  readonly type = 2;
   private readonly rep: string;
 
   constructor(value: number) {
@@ -52,5 +55,22 @@ class CrlDouble extends CrlNumber implements CrlType {
       return new CrlDouble(this.value ** other.value);
     }
     throw new Error("No se pudieron convertir los valores al tipo necesario.");
+  }
+
+  castTo(type: Type): CrlType {
+    switch (type) {
+      case 0:
+        throw new Error("No se pudo castear de double a bool");
+      case 1:
+        throw new Error("No se pudo castear de double a char");
+      case 2:
+        return new CrlInt(this.value);
+      case 3:
+        return this;
+      case 4:
+        return new CrlString(this.toString());
+      default:
+        throw new Error("No se pudo castear de bool a desconocido");
+    }
   }
 }

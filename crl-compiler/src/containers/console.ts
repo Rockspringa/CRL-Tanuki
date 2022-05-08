@@ -1,8 +1,8 @@
 export class ConsoleOutput {
-  messages: string[] = [];
+  private messages: string[] = [];
 
   getOutput(): string[] {
-    return this.messages.map((message: string) => Object.assign({}, message));
+    return [...this.messages];
   }
 
   addMessage(data: string) {

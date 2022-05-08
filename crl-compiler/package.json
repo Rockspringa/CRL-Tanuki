@@ -1,7 +1,7 @@
 {
   "name": "@crl-rocks/crl-compiler",
   "version": "1.0.0",
-  "main": "crl-compiler.js",
+  "main": "index.js",
   "license": "MIT",
   "private": true,
   "scripts": {

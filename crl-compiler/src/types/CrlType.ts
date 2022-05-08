@@ -1,4 +1,6 @@
-interface CrlType {
+export interface CrlType {
+  readonly type: Type;
+
   toString(): string;
 
   plus(other: CrlType): CrlType;
@@ -12,9 +14,11 @@ interface CrlType {
   modulus(other: CrlType): CrlType;
 
   raisedTo(other: CrlType): CrlType;
+
+  castTo(type: Type): CrlType;
 }
 
-class CrlNumber {
+export class CrlNumber {
   readonly value: number;
 
   constructor(value: number) {
@@ -26,10 +30,10 @@ class CrlNumber {
   }
 }
 
-enum Type {
+export enum Type {
   BOOL,
   CHAR,
-  DOUBLE,
   INT,
+  DOUBLE,
   STRING,
 }

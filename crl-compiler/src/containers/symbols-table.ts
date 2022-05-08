@@ -1,3 +1,5 @@
+import { CrlType, Type } from "../types";
+
 export interface Symbol {
   scopeName: string;
   column: number;
@@ -13,20 +15,23 @@ export interface Variable {
 }
 
 export class SymbolsTable {
-  symbols: Symbol[] = [];
-  subSymbolsTable: Symbol[][] = [];
+  private symbols: Symbol[] = [];
+  private subSymbolsTable: Symbol[][] = [];
 
   getSymbol(name: string, scope: number): Symbol {
     let sym = this.symbols.find(
-      (symbol: Symbol) => symbol.name === name && scope === scope
+      (symbol: Symbol) => symbol.name === name && symbol.scope === scope
     );
 
     if (sym) {
       return sym;
     } else {
-      sym = this.symbols.find(
-        (symbol: Symbol) => symbol.name === name && scope < scope
-      );
+      let i = scope;
+      while (!sym && 0 <= i) {
+        sym = this.symbols.find(
+          (symbol: Symbol) => symbol.name === name && symbol.scope === i
+        );
+      }
       if (sym) {
         return sym;
       } else {
@@ -38,20 +43,20 @@ export class SymbolsTable {
   addSymbol(data: Symbol): void {
     this.symbols.push(data);
 
-    const length = this.subSymbolsTable.length;
-
-    if (length > 0) {
-      this.subSymbolsTable[length].push(data);
+    if (this.subSymbolsTable[data.scope]) {
+      this.subSymbolsTable[data.scope].push(data);
     }
   }
 
-  getScopeAndSubScopes(): Symbol[] {
-    this.subSymbolsTable.push([]);
-    return this.subSymbolsTable[length - 1];
+  getScope(scope: number): Symbol[] {
+    this.subSymbolsTable[scope] = this.symbols.filter(
+      (symbol) => symbol.scope === scope
+    );
+    return this.subSymbolsTable[0];
   }
 
   removeScope(scope: number): void {
-    this.subSymbolsTable.pop();
+    this.subSymbolsTable.splice(scope, 1);
     this.symbols.filter((symbol: Symbol) => symbol.scope !== scope);
   }
 }

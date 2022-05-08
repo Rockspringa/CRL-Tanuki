@@ -1,14 +1,15 @@
 import { Expression, RepresentTree } from "../AbstractTree";
-import { symbolsTable, errors } from "../../parser/crl-parser";
+import { errorsTable, symbolsTable } from "../../crl-globals";
+import { CrlType } from "../../types";
 
 export class Reference implements Expression {
-  private readonly _name: string;
-  private readonly _scope: number;
-  private readonly _column: number;
-  private readonly _line: number;
+  readonly _name: string;
+  readonly _scope: number;
+  readonly _column: number;
+  readonly _line: number;
+  readonly rep: RepresentTree;
 
-  _value: CrlType | undefined;
-  rep: RepresentTree;
+  _value?: CrlType;
 
   constructor(name: string, column: number, line: number, scope: number) {
     this._column = column;
@@ -27,7 +28,7 @@ export class Reference implements Expression {
       this._value = symbolsTable.getSymbol(this._name, this._scope).data;
     } catch (e: any) {
       if (e instanceof Error) {
-        errors.addError({
+        errorsTable.addError({
           message: e.message,
           column: this._column,
           line: this._line,

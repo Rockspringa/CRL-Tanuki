@@ -1,7 +1,7 @@
-INT                [-]? (/*[1-9]*/ [0-9]+ /*| [0-9]*/)
-DOUBLE             [-]? {INT} "." [0-9]+
+INT                "-"? ([1-9] \d+ | \d)
+DOUBLE             {INT} "." \d+
 
-ID                 [a-zA-Z_$ñ]+
+ID                 [a-zA-Z_$ñ] [\w$ñ]+
 
 LINE_COMMENT       "!!" [^\n]* (\n | $)
 IGNORE             [ \r] | \b [ \t]+
@@ -37,7 +37,6 @@ const addDedents = (tabs, token) => {
 {LINE_COMMENT}     /* ignore */
 
 {INDENT}           %{
-  console.log("indent");
                       const tabs = yytext.length;
 
                       if (tabs > indent[0]) {
@@ -48,9 +47,9 @@ const addDedents = (tabs, token) => {
                       return addDedents(tabs, ['\n']);
                    %}
 
-"'''"              this.begin('comment');
-<comment>"'''"     this.popState();
-<comment><<EOF>>   this.popState();
+'''                this.begin('comment');
+<comment>'''       this.popState();
+<comment>$         this.popState();
 <comment>.         /* ignore */
 
 \b"Boolean"        return 'BOOLEAN';
@@ -79,32 +78,32 @@ const addDedents = (tabs, token) => {
 "--"               return '--';
 
 "+"                return '+';
-[-]                return '-';
-[*]                return '*';
+"-"                return '-';
+"*"                return '*';
 "/"                return '/';
-[%]                return '%';
-[\^]               return '^';
+"% "               return '%';
+\^                 return '^';
 
 "!="               return '!=';
 "<="               return '<=';
 ">="               return '>=';
 "=="               return '==';
-[<]                return '<';
-[>]                return '>';
-[~]                return '~';
+"<"                return '<';
+">"                return '>';
+"~"                return '~';
 
 "&&"               return '&&';
 "||"               return '||';
 "|&"               return '|&';
-[!]                return '!';
+"!"                return '!';
 
-[=]                return '=';
-[,]                return ',';
-[)]                return ')';
-[(]                return '(';
-[:]                return ':';
-[.]                return '.';
-[;]                return ';';
+"="                return '=';
+","                return ',';
+")"                return ')';
+"("                return '(';
+":"                return ':';
+"."                return '.';
+";"                return ';';
 \n([ \t]*\n)*      return '\n';
 \n\b               return addDedents(0, ['\n']);
 
@@ -116,15 +115,15 @@ const addDedents = (tabs, token) => {
 <string>$          addError(`No se cerro la especificacion del string.`, 0); return addDedents(0, ['EOF']);
 
 [']                this.begin('char');
-<char>"'"          this.popState();
+<char>[']          this.popState();
 <char>"\"[^'\n]    return '_CHAR';
 <char>[^'\n]       return '_CHAR';
 
 <char>\n           addError(`Se ingreso un salto de linea en lugar de un caracter.`, 0); return addDedents(0, ['EOF']);
 <char>$            addError(`No se termino la especificacion del caracter.`, 0); return addDedents(0, ['EOF']);
 
-{INT}              return '_INT';
 {DOUBLE}           return '_DOUBLE';
+{INT}              return '_INT';
 
 {ID}               return 'ID';
 

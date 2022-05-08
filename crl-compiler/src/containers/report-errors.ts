@@ -1,4 +1,4 @@
-export interface Error {
+export interface AnalyzeError {
   message: string;
   column: number;
   line: number;
@@ -12,13 +12,13 @@ export enum ErrorType {
 }
 
 export class ErrorsTable {
-  errors: Error[] = [];
+  private errors: AnalyzeError[] = [];
 
-  getErrors(): Error[] {
-    return this.errors.map((error: Error) => Object.assign({}, error));
+  getErrors(): AnalyzeError[] {
+    return this.errors.map((error: AnalyzeError) => Object.assign({}, error));
   }
 
-  addError(data: Error) {
+  addError(data: AnalyzeError) {
     this.errors.push(data);
   }
 }

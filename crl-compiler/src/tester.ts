@@ -1,3 +1,3 @@
-import { parseFile } from "./crl-compiler";
+import { parseFile } from "./crl-globals";
 
-parseFile("./tests/test-file.crl");
+parseFile("test.crl", "./tests/test-file.crl", []);

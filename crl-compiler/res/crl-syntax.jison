@@ -1,18 +1,7 @@
 %{
 
-const SymbolsTable = require("src/containers/symbols-table").SymbolsTable;
-const ErrorsTable = require("src/containers/report-errors").ErrorsTable;
-
-const symbolsTable = new SymbolsTable();
-const errors = new ErrorsTable();
-
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-    exports.symbolsTable = symbolsTable;
-    exports.errors = errors;
-}
-
 const addError = (message, type = 1, column = this.first_column, line = this.first_line) =>
-    errors.addError({ message, type, column, line });
+    yy.errorsTable.addError({ message, type, column, line });
 
 %}
 
@@ -44,7 +33,8 @@ header
   ;
 
 import
-  : IMPORTAR ID '.' ID '\n'
+  : IMPORTAR ID[id1] '.' ID[id2] '\n'
+    -> yy.parseImport(`${$id1}.${$id2}`, @1.first_column, @1.first_line);
   ;
 
 incerteza

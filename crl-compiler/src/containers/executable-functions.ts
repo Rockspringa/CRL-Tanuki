@@ -1,23 +1,28 @@
-import { AbstractTree } from "../asts/AbstractTree";
-import { Variable } from "./symbols-table";
-import { errors } from "../parser/crl-parser";
+import { Statement } from "../asts/AbstractTree";
+import { actualFile, errorsTable } from "../crl-globals";
+import { Type } from "../types";
+import { Variable } from "./";
 
 export interface Function {
   name: string;
-  params: Set<Variable>;
-  body: AbstractTree[];
+  params: Variable[];
+  body: Statement[];
+  file?: string;
   type?: Type;
 }
 
 export class FunctionsTable {
-  functions: Function[] = [];
+  private functions: Function[] = [];
 
-  getFunction(name: string, params: Variable[], type?: Type): Function | undefined {
+  getFunctions(name: string): Function[] {
+    return this.functions.filter((func: Function) => func.name === name);
+  }
+
+  getFunction(name: string, params: Variable[]): Function | undefined {
     return this.functions.find((func: Function) => {
-      if (func.name === name && func.type === type && func.params.size === params.length) {
-        const savedParams: Variable[] = [...func.params];
+      if (func.name === name && func.params.length === params.length) {
         for (let i: number = 0; i < params.length; i++) {
-          if (params[i].type !== savedParams[i].type) return false;
+          if (params[i].type !== func.params[i].type) return false;
         }
         return true;
       }
@@ -26,14 +31,34 @@ export class FunctionsTable {
   }
 
   addFunction(data: Function, column: number, line: number): void {
-    if (this.getFunction(data.name, [...data.params], data.type)) {
-      return errors.addError({
-        message: `La funcion ${data.name} no se pudo sobrecargar porque ya existe.`,
+    if (this.getFunction(data.name, [...data.params])) {
+      return errorsTable.addError({
+        message: `La funcion '${data.name}' no se pudo sobrecargar porque ya existe.`,
         column,
         line,
         type: 2,
       });
     }
+    if (data.name in ["Mostrar", "DibujarTS", "DibujarAST", "DibujarEXP"]) {
+      return errorsTable.addError({
+        message: `La funcion '${data.name}' no se pudo sobrecargar porque tiene el mismo nombre que las funciones por defecto.`,
+        column,
+        line,
+        type: 2,
+      });
+    }
+    // if (
+    //   data.type &&
+    //   !data.body.find()
+    // ) {
+    //   return errorsTable.addError({
+    //     message: `La funcion ${data.name} se declaro con un tipo pero nunca se retorna ningun valor.`,
+    //     column,
+    //     line,
+    //     type: 2,
+    //   });
+    // }
+    data.file = actualFile;
     this.functions.push(data);
   }
 }
