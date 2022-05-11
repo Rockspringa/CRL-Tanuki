@@ -1,56 +1,67 @@
-INT                "-"? ([1-9] \d+ | \d)
-DOUBLE             {INT} "." \d+
+INT                "-"? \d+ /!\.
+DOUBLE             "-"? \d+ "." \d+
 
-ID                 [a-zA-Z_$ñ] [\w$ñ]+
+ID                 [a-zA-Z_$ñ] [\w$ñ]*
 
 LINE_COMMENT       "!!" [^\n]* (\n | $)
-IGNORE             [ \r] | \b [ \t]+
+IGNORE             [ \r]
 
-INDENT             \n \t+ /!([ ]* ([\r\n]+ | $))
+INDENT             \t+
+DEDENT             "←"
 
 %{
 
-const indent = [0];
-
 const addDedents = (tabs, token) => {
-  const dedents = [...token];
-
-  if (token && tabs < indent[0]) dedents.unshift('\n');
-  
-  while (tabs < indent[0]) {
-    dedents.unshift('!\t');
-    indent.shift();
+  while (tabs < this.yy.indents[0]) {
+    this.yy.dedents.unshift('!\\t');
+    this.yy.indents.shift();
   }
 
-  if (dedents.length) return dedents;
+  if (token && !this.yy.eof) {
+    this.yy.dedents.unshift('\\n');
+    this.yy.dedents.push(token);
+    this.yy.eof = token === 'EOF';
+  }
+
+  if (this.yy.dedents.length) {
+    this.unput("←");
+  }
 }
 
 %}
 
-%s comment
-%s string
-%s char
+%x comment
+%x string
+%x char
 
 %%
 
 {IGNORE}           /* ignore */
 {LINE_COMMENT}     /* ignore */
 
-{INDENT}           %{
-                      const tabs = yytext.length;
-
-                      if (tabs > indent[0]) {
-                          indent.unshift(tabs);
-                          return ['\t', '\n'];
-                      }
-
-                      return addDedents(tabs, ['\n']);
+{DEDENT}           %{
+  if (this.yy.dedents.length) {
+    this.unput("←");
+    return this.yy.dedents.shift();
+  }
                    %}
 
-'''                this.begin('comment');
-<comment>'''       this.popState();
-<comment>$         this.popState();
-<comment>.         /* ignore */
+{INDENT}           %{
+  const tabs = yytext.length;
+
+  if (tabs > this.yy.indents[0]) {
+    this.yy.indents.unshift(tabs);
+    return '\\t';
+  } else if (tabs < this.yy.indents[0]) {
+    addDedents(tabs);
+  }
+                   %}
+
+[']                this.pushState('comment');
+<comment>"'''"     this.popState();
+<comment>$         this.popState(); addDedents(0, 'EOF');
+<comment>[^']+          /**/
+<comment>"'"(?!"''")    /**/
 
 \b"Boolean"        return 'BOOLEAN';
 \b"String"         return 'STRING';
@@ -70,9 +81,8 @@ const addDedents = (tabs, token) => {
 \b"Mientras"       return 'MIENTRAS';
 \b"Detener"        return 'DETENER';
 \b"Continuar"      return 'CONTINUAR';
-\b"Mostrar"        return 'MOSTRAR';
 \b"Importar"       return 'IMPORTAR';
-\b"incerteza"      return 'INCERTEZA';
+\b"Incerteza"      return 'INCERTEZA';
 
 "++"               return '++';
 "--"               return '--';
@@ -104,28 +114,29 @@ const addDedents = (tabs, token) => {
 ":"                return ':';
 "."                return '.';
 ";"                return ';';
-\n([ \t]*\n)*      return '\n';
-\n\b               return addDedents(0, ['\n']);
+\n/![\t\r\n]       if (yy.indents[0]) addDedents(0); return '\\n';
+\n/[\t\r\n]        return '\\n';
 
-["]                this.begin('string');
+["]                this.pushState('string');
 <string>["]        this.popState();
-<string>[^"\n]*    return '_STRING';
+<string>[^"\n]*    return 'STRING_';
 
-<string>\n         addError(`Se ingreso un salto de linea antes de cerrar el string.`, 0); return addDedents(0, ['EOF']);
-<string>$          addError(`No se cerro la especificacion del string.`, 0); return addDedents(0, ['EOF']);
+<string>\n         addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, 0, yylloc]);
+<string>$          addError.apply(this, [`No se cerro la especificacion del string.`, 0, yylloc]); addDedents(0, 'EOF');
 
-[']                this.begin('char');
-<char>[']          this.popState();
-<char>"\"[^'\n]    return '_CHAR';
-<char>[^'\n]       return '_CHAR';
+[']/!"''"          this.pushState('char');
+<char>[']/!"''"    this.popState();
+<char>"'''"        this.popState(); this.pushState('comment');
+<char>"\"[^'\n]    return 'CHAR_';
+<char>[^'\n]       return 'CHAR_';
 
-<char>\n           addError(`Se ingreso un salto de linea en lugar de un caracter.`, 0); return addDedents(0, ['EOF']);
-<char>$            addError(`No se termino la especificacion del caracter.`, 0); return addDedents(0, ['EOF']);
+<char>\n           addError.apply(this, [`Se ingreso un salto de linea en lugar de un caracter.`, 0, yylloc]); return '\n';
+<char>$            addError.apply(this, [`No se termino la especificacion del caracter.`, 0, yylloc]); addDedents(0, 'EOF');
 
-{DOUBLE}           return '_DOUBLE';
-{INT}              return '_INT';
+{DOUBLE}           return 'DOUBLE_';
+{INT}              return 'INT_';
 
 {ID}               return 'ID';
 
-$                  return addDedents(0, ['EOF']);
-.                  addError(`Token desconocido <<${yytext}>>.`, 0);
+$                  addDedents(0, 'EOF');
+.                  addError.apply(this, [`Token desconocido <<${yytext}>>.`, 0, yylloc]);

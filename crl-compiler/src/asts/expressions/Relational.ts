@@ -1,5 +1,5 @@
 import { Expression, RepresentTree } from "../AbstractTree";
-import { actualFile, errorsTable, symbolsTable } from "../../crl-globals";
+import { compileInfo } from "../../crl-globals";
 import { CrlBool, CrlNumber, CrlType } from "../../types";
 
 enum RelationalOperator {
@@ -37,8 +37,8 @@ export class Relational implements Expression {
 
     this.rep = {
       type: "Relacional",
-      represent: "",
-      children: [],
+      represent: this.getSymbol(),
+      children: [val1.rep, val2.rep],
     };
   }
 
@@ -48,7 +48,7 @@ export class Relational implements Expression {
 
     if (!(this._val1._value && this._val2._value)) return;
     if (this._val1._value.constructor !== this._val2._value.constructor) {
-      return errorsTable.addError({
+      return compileInfo.errorsTable.addError({
         message:
           "No se pueden comparar las expresiones porque son de diferente tipo.",
         column: this._column,
@@ -65,37 +65,30 @@ export class Relational implements Expression {
       this._val2._value instanceof CrlNumber
         ? this._val2._value.value
         : this._val2._value.toString();
-    this.rep.children = [this._val1.rep, this._val2.rep];
 
     switch (this._operator) {
       case 0: // EQUAL
         this._value = new CrlBool(+(val1 === val2));
-        this.rep.represent = "==";
         break;
 
       case 1: // DIFFERENT
         this._value = new CrlBool(+(val1 !== val2));
-        this.rep.represent = "!=";
         break;
 
       case 2: // LESS
         this._value = new CrlBool(+(val1 < val2));
-        this.rep.represent = "<";
         break;
 
       case 3: // LESS_EQUAL
         this._value = new CrlBool(+(val1 <= val2));
-        this.rep.represent = "<=";
         break;
 
       case 4: // GREATER
         this._value = new CrlBool(+(val1 > val2));
-        this.rep.represent = ">";
         break;
 
       case 5: // GREATER_EQUAL
         this._value = new CrlBool(+(val1 >= val2));
-        this.rep.represent = ">=";
         break;
 
       case 6: // UNCERTAINTY
@@ -103,7 +96,9 @@ export class Relational implements Expression {
           this._value = new CrlBool(
             +(
               Math.abs(val2 - val1) <=
-              +symbolsTable.getSymbol(`__inc_${actualFile}`, 0).data.toString()
+              +compileInfo.symbolsTable
+                .getSymbol(`__inc_${compileInfo.filename}`, 0)
+                .data.toString()
             )
           );
         } else if (typeof val1 === "string" && typeof val2 === "string") {
@@ -115,8 +110,35 @@ export class Relational implements Expression {
             )
           );
         }
-        this.rep.represent = "~";
         break;
+    }
+  }
+
+  private getSymbol() {
+    switch (this._operator) {
+      case 0: // EQUAL
+        return "==";
+
+      case 1: // DIFFERENT
+        return "!=";
+
+      case 2: // LESS
+        return "<";
+
+      case 3: // LESS_EQUAL
+        return "<=";
+
+      case 4: // GREATER
+        return ">";
+
+      case 5: // GREATER_EQUAL
+        return ">=";
+
+      case 6: // UNCERTAINTY
+        return "~";
+
+      default:
+        return " ";
     }
   }
 }

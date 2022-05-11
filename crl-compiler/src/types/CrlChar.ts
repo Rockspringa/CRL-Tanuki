@@ -9,7 +9,7 @@ import {
 } from "./";
 
 export class CrlChar extends CrlInt {
-  readonly type = 1;
+  readonly type: Type = 1;
 
   private readonly char: string;
 

@@ -26,11 +26,12 @@ export class SymbolsTable {
     if (sym) {
       return sym;
     } else {
-      let i = scope;
+      let i = scope - 1;
       while (!sym && 0 <= i) {
         sym = this.symbols.find(
           (symbol: Symbol) => symbol.name === name && symbol.scope === i
         );
+        i--;
       }
       if (sym) {
         return sym;
@@ -42,6 +43,7 @@ export class SymbolsTable {
 
   addSymbol(data: Symbol): void {
     this.symbols.push(data);
+    if (!data.scopeName) data.scopeName = "__base__";
 
     if (this.subSymbolsTable[data.scope]) {
       this.subSymbolsTable[data.scope].push(data);
@@ -57,6 +59,6 @@ export class SymbolsTable {
 
   removeScope(scope: number): void {
     this.subSymbolsTable.splice(scope, 1);
-    this.symbols.filter((symbol: Symbol) => symbol.scope !== scope);
+    this.symbols = this.symbols.filter((symbol: Symbol) => symbol.scope !== scope);
   }
 }

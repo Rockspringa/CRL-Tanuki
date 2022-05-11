@@ -1,7 +1,7 @@
 import { CrlType, Type } from "./";
 
 export class CrlString implements CrlType {
-  readonly type = 4;
+  readonly type: Type = 4;
   readonly value: string;
 
   constructor(value: string) {

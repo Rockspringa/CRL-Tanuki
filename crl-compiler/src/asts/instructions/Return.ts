@@ -2,6 +2,7 @@ import { Expression, RepresentTree, Statement } from "../AbstractTree";
 import { CrlType } from "../../types";
 
 export class Return implements Statement {
+  readonly __return?: boolean = true;
   readonly _value?: Expression;
   readonly rep: RepresentTree;
 

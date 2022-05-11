@@ -9,7 +9,7 @@ import {
 } from "./";
 
 export class CrlBool extends CrlNumber implements CrlType {
-  readonly type = 0;
+  readonly type: Type = 0;
 
   plus(other: CrlType): CrlType {
     if (other instanceof CrlInt) {

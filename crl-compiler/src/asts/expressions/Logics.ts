@@ -1,5 +1,5 @@
 import { Expression, RepresentTree } from "../AbstractTree";
-import { errorsTable } from "../../crl-globals";
+import { compileInfo } from "../../crl-globals";
 import { CrlBool, CrlType } from "../../types";
 
 enum LogicOperator {
@@ -34,8 +34,8 @@ export class Logics implements Expression {
 
     this.rep = {
       type: "Logica",
-      represent: "",
-      children: [],
+      represent: this.getSymbol(),
+      children: this.getSymbol() !== "!" ? [val1.rep, val2.rep] : [val2.rep],
     };
   }
 
@@ -45,7 +45,7 @@ export class Logics implements Expression {
 
     if (!(this._val1._value && this._val2._value)) return;
     if (!(this._val1._value instanceof CrlBool)) {
-      return errorsTable.addError({
+      return compileInfo.errorsTable.addError({
         message:
           "Se esperaba una expresion booleana a la izquiera del operador logico.",
         column: this._column,
@@ -53,7 +53,7 @@ export class Logics implements Expression {
         type: 2,
       });
     } else if (!(this._val2._value instanceof CrlBool)) {
-      return errorsTable.addError({
+      return compileInfo.errorsTable.addError({
         message:
           "Se esperaba una expresion booleana a la derecha del operador logico.",
         column: this._column,
@@ -64,29 +64,42 @@ export class Logics implements Expression {
 
     const val1: CrlBool = this._val1._value;
     const val2: CrlBool = this._val2._value;
-    this.rep.children = [this._val1.rep, this._val2.rep];
 
     switch (this._operator) {
       case 0: // AND
         this._value = new CrlBool(val1.value && val2.value);
-        this.rep.represent = "&&";
         break;
 
       case 1: // OR
         this._value = new CrlBool(val1.value || val2.value);
-        this.rep.represent = "||";
         break;
 
       case 2: // XOR
         this._value = new CrlBool(+(val1.value != val2.value));
-        this.rep.represent = "|&";
         break;
 
       case 3: // NOT
         this._value = new CrlBool(+(val1.value === val2.value));
-        this.rep.represent = "!";
-        this.rep.children = [this._val1.rep];
         break;
+    }
+  }
+
+  private getSymbol() {
+    switch (this._operator) {
+      case 0: // AND
+        return "&&";
+
+      case 1: // OR
+        return "||";
+
+      case 2: // XOR
+        return "|&";
+
+      case 3: // NOT
+        return "!";
+
+      default:
+        return " ";
     }
   }
 }

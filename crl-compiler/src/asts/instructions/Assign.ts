@@ -4,10 +4,9 @@ import {
   Expression,
   RepresentTree,
 } from "../AbstractTree";
-import { symbolsTable } from "../../crl-globals";
+import {compileInfo, scopeStack} from "../../crl-globals";
 
 export class Assign implements ExecutableStatement {
-  readonly _scope: number;
   readonly _column: number;
   readonly _line: number;
 
@@ -18,21 +17,14 @@ export class Assign implements ExecutableStatement {
     type: "Statement",
     represent: "Asignacion",
     children: [
-      { type: "ID", represent: "ID" },
-      { type: "Statement", represent: "Expression" },
+      {type: "ID", represent: "ID"},
+      {type: "Statement", represent: "Expression"},
     ],
   };
 
-  constructor(
-    name: string,
-    value: Expression,
-    scope: number,
-    column: number,
-    line: number
-  ) {
+  constructor(name: string, value: Expression, column: number, line: number) {
     this._name = name;
     this._value = value;
-    this._scope = scope;
     this._column = column;
     this._line = line;
   }
@@ -43,7 +35,10 @@ export class Assign implements ExecutableStatement {
     if (!this._value._value) return;
 
     try {
-      const _symbol = symbolsTable.getSymbol(this._name, this._scope);
+      const _symbol = compileInfo.symbolsTable.getSymbol(
+        this._name,
+        scopeStack.length
+      );
       _symbol.data = this._value._value.castTo(_symbol.data.type);
     } catch (e: any) {
       addError(this._value, e.message);

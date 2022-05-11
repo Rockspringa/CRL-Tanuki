@@ -1,7 +1,7 @@
 import { CrlInt, CrlNumber, CrlString, CrlType, Type } from "./";
 
 export class CrlDouble extends CrlNumber implements CrlType {
-  readonly type = 2;
+  readonly type: Type = 3;
   private readonly rep: string;
 
   constructor(value: number) {

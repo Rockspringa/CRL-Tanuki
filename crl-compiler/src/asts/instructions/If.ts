@@ -7,6 +7,7 @@ import {
   Statement,
 } from "../AbstractTree";
 import { CrlBool, CrlType } from "../../types";
+import {compileInfo, scopeStack} from "../../crl-compiler";
 
 export class If implements ControlStatement {
   readonly _condition: Expression;
@@ -14,8 +15,9 @@ export class If implements ControlStatement {
   readonly _elseBody?: Statement[];
   readonly rep: RepresentTree;
 
-  _return?: CrlType;
   _break?: boolean;
+  _return?: CrlType;
+  __return?: boolean;
   _continue?: boolean;
 
   constructor(
@@ -55,19 +57,24 @@ export class If implements ControlStatement {
   }
 
   execute(): void {
+    scopeStack.push("SubAmbito_Si");
     this._condition.execute();
 
     if (this._condition._value) {
       try {
-        const condition: CrlBool = this._condition._value.castTo(0) as CrlBool;
+        const condition = this._condition._value.castTo(0) as CrlBool;
         if (condition.value) {
           executeStatements(this._body, this);
         } else if (this._elseBody) {
+          scopeStack.pop();
+          scopeStack.push("SubAmbito_Sino");
           executeStatements(this._elseBody, this);
         }
+        compileInfo.symbolsTable.removeScope(scopeStack.length);
       } catch (e: any) {
-        return addError(this._condition, e.message);
+        addError(this._condition, e.message);
       }
     }
+    scopeStack.pop();
   }
 }

@@ -1,4 +1,3 @@
-import { readFile } from "fs";
 import {
   ConsoleOutput,
   ErrorsTable,
@@ -7,34 +6,34 @@ import {
   SymbolsTable,
 } from "./containers";
 import { parse as parseCrl, parser as properties } from "./parser/crl-parser";
-import { CodeFile, CompileOutput, toolsBundle } from "./crl-globals";
+import {
+  CodeFile,
+  CompileInfo,
+  CompileOutput,
+  toolsBundle,
+} from "./crl-globals";
 import { CrlDouble } from "./types";
+import { executeStatements } from "./asts/AbstractTree";
+import { FunctionCall } from "./asts/expressions";
 
-export let files: CodeFile[];
-export let graphsOut: InfoGraphics;
-export let consoleOut: ConsoleOutput;
-export let errorsTable: ErrorsTable;
-export let symbolsTable: SymbolsTable;
-export let functionsTable: FunctionsTable;
+export const getScopeName = () => scopeStack.join("_");
+export const scopeStack: string[] = [];
 
-export let actualFile: string = "__base__";
-
-export const executeFunction = (filename: string, callback: Function) => {
-  const tmp = actualFile;
-  actualFile = filename;
-  callback();
-  actualFile = tmp;
+export let compileInfo: CompileInfo = {
+  files: [],
+  filename: "__base__",
+  graphsOut: new InfoGraphics(),
+  consoleOut: new ConsoleOutput(),
+  errorsTable: new ErrorsTable(),
+  symbolsTable: new SymbolsTable(),
+  functionsTable: new FunctionsTable(),
 };
 
-export const parseFile = (
-  name: string,
-  filepath: string,
-  files: CodeFile[]
-) => {
-  readFile(filepath, (err, data) => {
-    if (err) throw err;
-    parse(name, data.toString(), files);
-  });
+export const executeFunction = (filename: string, callback: Function) => {
+  const tmp = compileInfo.filename;
+  compileInfo.filename = filename;
+  callback();
+  compileInfo.filename = tmp;
 };
 
 export const parse = (
@@ -42,37 +41,37 @@ export const parse = (
   code: string,
   _files: CodeFile[]
 ): CompileOutput => {
-  files = _files;
-  graphsOut = new InfoGraphics();
-  consoleOut = new ConsoleOutput();
-  errorsTable = new ErrorsTable();
-  symbolsTable = new SymbolsTable();
-  functionsTable = new FunctionsTable();
+  compileInfo.files = _files;
+  compileInfo.filename = filename;
 
-  properties.yy = toolsBundle;
+  Object.assign(properties.yy, toolsBundle);
 
   commonParse(filename, code);
+  executePrincipal();
 
-  if (errorsTable.getErrors().length) {
-    return { errors: errorsTable.getErrors() };
-  } else {
-    return {
-      data: {
-        console: consoleOut.getOutput(),
-        graphs: graphsOut.getGraphs(),
-      },
-    };
-  }
+  compileInfo = {
+    files: [],
+    filename: "__base__",
+    graphsOut: new InfoGraphics(),
+    consoleOut: new ConsoleOutput(),
+    errorsTable: new ErrorsTable(),
+    symbolsTable: new SymbolsTable(),
+    functionsTable: new FunctionsTable(),
+  };
+
+  const a = getOutputData();
+  console.log(JSON.stringify(a, null, 2));
+  return a;
 };
 
 export const parseImport = (filename: string, column: number, line: number) => {
-  const _file: CodeFile | undefined = files.find(
+  const _file: CodeFile | undefined = compileInfo.files.find(
     (_file: CodeFile) => _file.name === filename
   );
   if (_file) {
     commonParse(_file.name, _file.code);
   } else {
-    errorsTable.addError({
+    compileInfo.errorsTable.addError({
       message: `No se encontro el archivo '${filename}'.`,
       column,
       line,
@@ -81,11 +80,62 @@ export const parseImport = (filename: string, column: number, line: number) => {
   }
 };
 
-const commonParse = (filename: string, code: string) => {
-  const tmp = actualFile;
+const executePrincipal = (): void => {
+  const main = compileInfo.functionsTable.getFunction("Principal", []);
+  if (main) {
+    if (main.type) {
+      compileInfo.errorsTable.addError({
+        message: "La funcion principal debe ser 'Void'",
+        type: 2,
+        line: 0,
+        column: 0,
+      });
+    } else if (main.file != compileInfo.filename) {
+      compileInfo.errorsTable.addError({
+        message: "La funcion principal debe de estar en el archivo inicial.",
+        type: 2,
+        line: 0,
+        column: 0,
+      });
+    } else {
+      scopeStack.push("Funcion_Principal");
+      executeStatements(
+        main.body,
+        new FunctionCall({ name: main.name, params: [] }, 0, 0)
+      );
+      scopeStack.pop();
+      return;
+    }
+  } else {
+    compileInfo.errorsTable.addError({
+      message: "No existe una funcion principal en el proyecto.",
+      type: 2,
+      line: 0,
+      column: 0,
+    });
+  }
+};
 
-  actualFile = filename;
-  symbolsTable.addSymbol({
+const getOutputData = (): CompileOutput => {
+  if ((properties.yy as any).compileInfo.errorsTable.getErrors().length) {
+    return {
+      errors: (properties.yy as any).compileInfo.errorsTable.getErrors(),
+    };
+  } else {
+    return {
+      data: {
+        console: (properties.yy as any).compileInfo.consoleOut.getOutput(),
+        graphs: (properties.yy as any).compileInfo.graphsOut.getGraphs(),
+      },
+    };
+  }
+};
+
+const commonParse = (filename: string, code: string) => {
+  const tmp = compileInfo.filename;
+
+  compileInfo.filename = filename;
+  compileInfo.symbolsTable.addSymbol({
     scopeName: "__base__",
     scope: 0,
     data: new CrlDouble(0.5),
@@ -94,7 +144,7 @@ const commonParse = (filename: string, code: string) => {
     column: -1,
   });
 
-  parseCrl(code.toString().concat("\n").replace(/\s+$/, "\n"));
+  parseCrl(code.toString().replace(/\r/g, ""));
 
-  actualFile = tmp;
+  compileInfo.filename = tmp;
 };

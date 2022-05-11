@@ -1,8 +1,12 @@
+import {compileInfo, getScopeName} from "../crl-compiler";
+
 export interface AnalyzeError {
   message: string;
   column: number;
   line: number;
   type: ErrorType;
+  file?: string;
+  scopeName?: string;
 }
 
 export enum ErrorType {
@@ -20,5 +24,7 @@ export class ErrorsTable {
 
   addError(data: AnalyzeError) {
     this.errors.push(data);
+    data.file = compileInfo.filename;
+    data.scopeName = getScopeName();
   }
 }

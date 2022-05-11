@@ -1,5 +1,5 @@
 import { Expression, RepresentTree } from "../AbstractTree";
-import { errorsTable } from "../../crl-globals";
+import { compileInfo } from "../../crl-globals";
 import { CrlType } from "../../types";
 
 enum ArithmeticOperator {
@@ -36,8 +36,8 @@ export class Arithmetic implements Expression {
 
     this.rep = {
       type: "Aritmetica",
-      represent: "",
-      children: [],
+      represent: this.getSymbol(),
+      children: [num1.rep, num2.rep],
     };
   }
 
@@ -49,7 +49,6 @@ export class Arithmetic implements Expression {
 
     const num1: CrlType = this._val1._value;
     const num2: CrlType = this._val2._value;
-    this.rep.children = [this._val1.rep, this._val2.rep];
 
     try {
       switch (this._operator) {
@@ -85,13 +84,38 @@ export class Arithmetic implements Expression {
       }
     } catch (e: any) {
       if (e instanceof Error) {
-        errorsTable.addError({
+        compileInfo.errorsTable.addError({
           message: e.message,
           column: this._column,
           line: this._line,
           type: 2,
         });
       }
+    }
+  }
+
+  private getSymbol() {
+    switch (this._operator) {
+      case 0: // PLUS
+        return "+";
+
+      case 1: // MINUS
+        return "-";
+
+      case 2: // TIMES
+        return "*";
+
+      case 3: // DIVIDED
+        return "/";
+
+      case 4: // MODULUS
+        return "%";
+
+      case 5: // RAISED_TO
+        return "^";
+
+      default:
+        return " ";
     }
   }
 }

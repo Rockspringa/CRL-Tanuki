@@ -5,7 +5,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "compile": "yarn translate && tsc && node dist/tester.js",
+    "test": "node dist/tester.js",
+    "compile": "yarn translate && tsc",
     "translate": "jison res/crl-syntax.jison res/crl-lex.jison -o src/parser/crl-parser.js"
   },
   "author": "",

@@ -1,4 +1,12 @@
-import { AnalyzeError, Graph } from "./containers";
+import {
+  AnalyzeError,
+  ConsoleOutput,
+  ErrorsTable,
+  FunctionsTable,
+  Graph,
+  InfoGraphics,
+  SymbolsTable,
+} from "./containers";
 import {
   Arithmetic,
   FunctionCall,
@@ -17,8 +25,18 @@ import {
   Return,
   While,
 } from "./asts/instructions";
-import { CrlBool, CrlChar, CrlDouble, CrlInt, CrlString } from "./types";
-import { errorsTable, files, parseImport } from "./crl-globals";
+import { CrlBool, CrlChar, CrlDouble, CrlInt, CrlString, Type } from "./types";
+import { compileInfo, parseImport } from "./crl-globals";
+
+export interface CompileInfo {
+  files: CodeFile[];
+  graphsOut: InfoGraphics;
+  consoleOut: ConsoleOutput;
+  errorsTable: ErrorsTable;
+  symbolsTable: SymbolsTable;
+  functionsTable: FunctionsTable;
+  filename: string;
+}
 
 export interface CodeFile {
   name: string;
@@ -34,15 +52,17 @@ export interface CompileOutput {
 }
 
 export const toolsBundle = {
-  files: files,
-  scopeStack: [],
-  parseImport: parseImport,
-  errorsTable: errorsTable,
+  compileInfo,
+  parseImport,
+  indents: [0],
+  dedents: [],
+  eof: false,
   CrlBool,
   CrlChar,
   CrlDouble,
   CrlInt,
   CrlString,
+  Type,
   Arithmetic,
   FunctionCall,
   Logics,

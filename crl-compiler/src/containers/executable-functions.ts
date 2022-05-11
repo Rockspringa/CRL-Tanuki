@@ -1,5 +1,5 @@
 import { Statement } from "../asts/AbstractTree";
-import { actualFile, errorsTable } from "../crl-globals";
+import { compileInfo } from "../crl-globals";
 import { Type } from "../types";
 import { Variable } from "./";
 
@@ -32,7 +32,7 @@ export class FunctionsTable {
 
   addFunction(data: Function, column: number, line: number): void {
     if (this.getFunction(data.name, [...data.params])) {
-      return errorsTable.addError({
+      return compileInfo.errorsTable.addError({
         message: `La funcion '${data.name}' no se pudo sobrecargar porque ya existe.`,
         column,
         line,
@@ -40,7 +40,7 @@ export class FunctionsTable {
       });
     }
     if (data.name in ["Mostrar", "DibujarTS", "DibujarAST", "DibujarEXP"]) {
-      return errorsTable.addError({
+      return compileInfo.errorsTable.addError({
         message: `La funcion '${data.name}' no se pudo sobrecargar porque tiene el mismo nombre que las funciones por defecto.`,
         column,
         line,
@@ -58,7 +58,7 @@ export class FunctionsTable {
     //     type: 2,
     //   });
     // }
-    data.file = actualFile;
+    data.file = compileInfo.filename;
     this.functions.push(data);
   }
 }

@@ -1,11 +1,11 @@
 import { CrlChar, CrlDouble, CrlNumber, CrlString, CrlType, Type } from "./";
 
 export class CrlInt extends CrlNumber implements CrlType {
-  readonly type;
+  readonly type: Type;
 
   constructor(value: number) {
     super(value | 0);
-    this.type = 3;
+    this.type = 2;
   }
 
   plus(other: CrlType): CrlType {

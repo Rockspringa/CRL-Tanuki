@@ -4,7 +4,7 @@ import {
   Expression,
   RepresentTree,
 } from "../AbstractTree";
-import { symbolsTable } from "../../crl-globals";
+import {compileInfo, getScopeName, scopeStack} from "../../crl-globals";
 import {
   CrlBool,
   CrlChar,
@@ -15,8 +15,6 @@ import {
 } from "../../types";
 
 export class Declare implements ExecutableStatement {
-  readonly _scope: number;
-  readonly _scopeName: string;
   readonly _column: number;
   readonly _line: number;
 
@@ -32,16 +30,12 @@ export class Declare implements ExecutableStatement {
       names: string[];
       value?: Expression;
     },
-    scope: number,
-    scopeName: string,
     column: number,
     line: number
   ) {
     this._type = _var.type;
     this._names = _var.names;
     this._value = _var.value;
-    this._scope = scope;
-    this._scopeName = scopeName;
     this._column = column;
     this._line = line;
 
@@ -71,10 +65,10 @@ export class Declare implements ExecutableStatement {
       const data = _val.castTo(this._type);
 
       for (const name of this._names) {
-        symbolsTable.addSymbol({
-          scopeName: this._scopeName,
+        compileInfo.symbolsTable.addSymbol({
+          scopeName: getScopeName(),
           column: this._column,
-          scope: this._scope,
+          scope: scopeStack.length,
           line: this._line,
           data,
           name,

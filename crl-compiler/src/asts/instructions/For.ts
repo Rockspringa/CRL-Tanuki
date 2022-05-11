@@ -7,7 +7,7 @@ import {
   Statement,
 } from "../AbstractTree";
 import { Declare } from "./Declare";
-import { symbolsTable } from "../../crl-globals";
+import { compileInfo, scopeStack } from "../../crl-globals";
 import { Symbol } from "../../containers";
 import { CrlBool, CrlInt, CrlType } from "../../types";
 
@@ -18,8 +18,9 @@ export class For implements ControlStatement {
   readonly _body: Statement[];
   readonly rep: RepresentTree;
 
-  _return?: CrlType;
   _break?: boolean;
+  _return?: CrlType;
+  __return?: boolean;
   _continue?: boolean;
 
   constructor(
@@ -50,37 +51,48 @@ export class For implements ControlStatement {
   }
 
   execute(): void {
+    scopeStack.push("SubAmbito_Para");
     this._declaration.execute();
 
     let _var: Symbol;
     try {
-      _var = symbolsTable.getSymbol(
+      _var = compileInfo.symbolsTable.getSymbol(
         this._declaration._names[0],
-        this._declaration._scope
+        scopeStack.length
       );
     } catch (e: any) {
-      return addError(this._declaration, e.message);
+      addError(this._declaration, e.message);
+      scopeStack.pop();
+      return;
     }
 
     this._condition.execute();
-    if (!this._condition._value) return;
+    if (!this._condition._value) {
+      compileInfo.symbolsTable.removeScope(scopeStack.length);
+      scopeStack.pop();
+      return;
+    }
 
     try {
       while (
         (this._condition._value.castTo(0) as CrlBool).value &&
-        !this._break
+        !this._break &&
+        !this._return
       ) {
         executeStatements(this._body, this);
-        this._condition.execute();
 
         _var.data = new CrlInt(
           (_var.data as CrlInt).value + (this._increment ? 1 : -2)
         );
+
+        this._condition.execute();
       }
       this._break = undefined;
       this._continue = undefined;
     } catch (e: any) {
-      return addError(this._condition, e.message);
+      addError(this._condition, e.message);
     }
+    compileInfo.symbolsTable.removeScope(scopeStack.length);
+    scopeStack.pop();
   }
 }

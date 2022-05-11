@@ -1,1 +1,7 @@
-Importar test2.crl
+Void Principal():
+	Boolean bandera1=true
+	String gane1=Compi1()
+
+String asd():
+	Si (si):
+		print("")

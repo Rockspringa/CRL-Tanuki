@@ -7,14 +7,16 @@ import {
   Statement,
 } from "../AbstractTree";
 import { CrlBool, CrlType } from "../../types";
+import {compileInfo, scopeStack} from "../../crl-compiler";
 
 export class While implements ControlStatement {
   readonly _condition: Expression;
   readonly _body: Statement[];
   readonly rep: RepresentTree;
 
-  _return?: CrlType;
   _break?: boolean;
+  _return?: CrlType;
+  __return?: boolean;
   _continue?: boolean;
 
   constructor(condition: Expression, body: Statement[]) {
@@ -36,13 +38,18 @@ export class While implements ControlStatement {
   }
 
   execute(): void {
+    scopeStack.push("SubAmbito_Mientras");
     this._condition.execute();
-    if (!this._condition._value) return;
+    if (!this._condition._value) {
+      scopeStack.pop();
+      return;
+    }
 
     try {
       while (
         (this._condition._value.castTo(0) as CrlBool).value &&
-        !this._break
+        !this._break &&
+        !this._return
       ) {
         executeStatements(this._body, this);
         this._condition.execute();
@@ -50,7 +57,9 @@ export class While implements ControlStatement {
       this._break = undefined;
       this._continue = undefined;
     } catch (e: any) {
-      return addError(this._condition, e.message);
+      addError(this._condition, e.message);
     }
+    compileInfo.symbolsTable.removeScope(scopeStack.length);
+    scopeStack.pop();
   }
 }
