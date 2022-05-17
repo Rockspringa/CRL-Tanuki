@@ -1,4 +1,4 @@
-import { CrlType, Type } from "../types";
+import {CrlType, Type} from "../types/CrlType";
 
 export interface Symbol {
   scopeName: string;
@@ -36,14 +36,17 @@ export class SymbolsTable {
       if (sym) {
         return sym;
       } else {
-        throw new Error(`No existe la variable ${name}.`);
+        throw new Error(`Se esta usando la variable '${name}' antes de declararla.`);
       }
     }
   }
 
   addSymbol(data: Symbol): void {
+    if (this.symbols.find(symbol => symbol.name === data.name && symbol.scope === data.scope)) {
+      throw new Error(`La variable '${data.name}' ya se declaro anteriormente en el mismo ambito.`)
+    }
     this.symbols.push(data);
-    if (!data.scopeName) data.scopeName = "__base__";
+    if (!data.scopeName) data.scopeName = "__global__";
 
     if (this.subSymbolsTable[data.scope]) {
       this.subSymbolsTable[data.scope].push(data);
@@ -54,7 +57,7 @@ export class SymbolsTable {
     this.subSymbolsTable[scope] = this.symbols.filter(
       (symbol) => symbol.scope === scope
     );
-    return this.subSymbolsTable[0];
+    return this.subSymbolsTable[scope];
   }
 
   removeScope(scope: number): void {

@@ -1,0 +1,1 @@
+{"version":3,"file":"Break.d.ts","sourceRoot":"","sources":["../../../src/asts/instructions/Break.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,SAAS,EAAE,MAAM,iBAAiB,CAAC;AAE3D,qBAAa,KAAM,YAAW,SAAS;IACrC,QAAQ,CAAC,MAAM,EAAE,OAAO,CAAQ;IAChC,QAAQ,CAAC,GAAG,EAAE,aAAa,CAGzB;IAEF,OAAO,IAAI,IAAI;CAChB"}

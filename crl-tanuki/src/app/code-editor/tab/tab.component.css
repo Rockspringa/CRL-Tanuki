@@ -1,0 +1,31 @@
+.tab-box {
+  position: relative;
+
+  width: fit-content;
+  height: fit-content;
+}
+
+.tab {
+  width: fit-content;
+
+  padding: 5px 22px 5px 12px;
+
+  opacity: 1;
+}
+
+.tab.active {
+  border-bottom: 2px solid var(--yellow);
+
+  color: var(--blue);
+  background-color: var(--dark-gray);
+}
+
+.icon {
+  position: absolute;
+  right: 5px;
+
+  border-bottom-color: transparent !important;
+
+  width: fit-content !important;
+  background-color: transparent !important;
+}

@@ -1,0 +1,49 @@
+!!Aqui estoy declarando una incerteza.
+Incerteza 1.5
+Int factorial(Int n):
+	Int num = 1
+	Mientras (n >= 1):
+		num = num * n
+		n = n - 1
+	Retorno num
+
+
+Void Saludar(String mensaje, Boolean tipo, Boolean tipo1):
+	Si (tipo && tipo1):
+		Mostrar ("Dar saludo")
+		Mostrar ("{0}", mensaje)
+	Sino:
+		Si(tipo |& tipo1):
+			Mostrar ("Sigue en el programa")
+		Sino:
+			Mostrar ("Dar despedida")
+			Mostrar ("{0}", mensaje)
+		Mostrar ("Se acabo el sino")
+	Mostrar ("Se acabo la funcion")
+
+
+
+Void Imprimir(Int a, Int b):
+	Para (Int i=1; i<a; ++):
+		Para (Int j=1; j<b;++):
+			Si(j~3):
+				Mostrar ("Matriz x={0}, y={1}",i,j)
+
+Void Imprimir2(Int a, Int b):
+	Para (Int i=1; i<a; ++):
+		Para (Int j=1; j<b;++):
+			Si(j~3):
+				Continuar
+			Mostrar ("Matriz x={0}, y={1}",i,j)
+
+Void Contar(Int a):
+	Para (Int i=0; i<a; ++):
+		Si (i>=5):
+			Detener
+		Mostrar ("numero: {0}", i)
+
+
+Double Graficar(Double a):
+	Si (a>10):
+		Retorno 1
+	Retorno a

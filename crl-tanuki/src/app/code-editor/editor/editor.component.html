@@ -1,0 +1,34 @@
+<div class="principal-container">
+  <ngx-codemirror
+    id="principal"
+    [options]="options"
+    [(ngModel)]="tab.code"
+    (cursorActivity)="setCursorPosition($event)"
+    [preserveScrollPosition]="true"
+    (ngModelChange)="cleanClasses()"
+  ></ngx-codemirror>
+
+  <div id="tool-bar">
+    <app-redirect-buttons
+      *ngIf="successfulBuild !== undefined"
+      [show]="successfulBuild"
+      [dataBunch]="refsOnSucceed"
+      [elseData]="refsOnFail"
+    ></app-redirect-buttons>
+    <!--console, graphs and errors buttons-->
+
+    <button type="button" [ngClass]="playClasses" class="btn icon" (click)="delegateBuildCode()">
+      <span>  Ejecutar </span>
+      <!--play button-->
+    </button>
+
+    <button type="button" class="btn icon" (click)="downloadFile.emit()">
+      <span>  Descargar </span>
+      <!--download button-->
+    </button>
+
+    <div></div>
+
+    <span id="cursor">Ln {{ line }}, Col {{ column }}</span>
+  </div>
+</div>

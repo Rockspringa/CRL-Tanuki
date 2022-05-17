@@ -1,0 +1,1 @@
+{"version":3,"file":"Continue.d.ts","sourceRoot":"","sources":["../../../src/asts/instructions/Continue.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,SAAS,EAAE,MAAM,iBAAiB,CAAC;AAE3D,qBAAa,QAAS,YAAW,SAAS;IACxC,QAAQ,CAAC,SAAS,EAAE,OAAO,CAAQ;IACnC,QAAQ,CAAC,GAAG,EAAE,aAAa,CAGzB;IAEF,OAAO,IAAI,IAAI;CAChB"}

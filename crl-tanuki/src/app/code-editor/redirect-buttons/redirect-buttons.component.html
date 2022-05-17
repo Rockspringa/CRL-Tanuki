@@ -1,0 +1,19 @@
+<ng-container *ngIf="show; else bugs">
+  <ng-container *ngFor="let data of dataBunch">
+    <button type="button" class="btn icon with-state accepted" [routerLink]="data.url">
+      <span>{{ data.icon }}</span>
+      <!--console button-->
+    </button>
+  </ng-container>
+</ng-container>
+
+<ng-template #bugs>
+  <ng-container *ngFor="let data of elseData">
+    <button type="button" class="btn icon with-state rejected" [routerLink]="data.url">
+      <span>{{ data.icon }}</span>
+      <!--console button-->
+    </button>
+  </ng-container>
+</ng-template>
+
+<div></div>

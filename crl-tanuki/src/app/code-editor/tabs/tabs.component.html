@@ -1,0 +1,30 @@
+<div id="tabs">
+  <ng-container *ngFor="let tab of tabs; index as index">
+    <app-tab
+      [tab]="tab.name"
+      [active]="tab.active"
+      (close)="close.emit(index)"
+      (click)="open.emit(index)"
+      (dblclick)="renameFile.emit(index)"
+    ></app-tab>
+  </ng-container>
+
+  <button type="button" class="btn icon" (click)="addTab.emit()">
+    <span></span>
+  </button>
+
+  <button type="button" class="btn icon" id="import">
+    <span></span>
+
+    <label>
+      <input
+        type="file"
+        name="file"
+        accept=".crl"
+        (change)="handleFiles($event.currentTarget)"
+        hidden
+        multiple="multiple"
+      />
+    </label>
+  </button>
+</div>

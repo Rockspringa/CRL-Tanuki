@@ -1,0 +1,9 @@
+{
+  "name": "testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@crl-rocks/crl-compiler": "../crl-compiler"
+  }
+}

@@ -1,6 +1,6 @@
-import { Expression, RepresentTree } from "../AbstractTree";
-import { compileInfo } from "../../crl-globals";
-import { CrlBool, CrlType } from "../../types";
+import { compileTools, Expression, RepresentTree } from "../AbstractTree";
+import { CrlType } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
 
 enum LogicOperator {
   AND,
@@ -45,7 +45,7 @@ export class Logics implements Expression {
 
     if (!(this._val1._value && this._val2._value)) return;
     if (!(this._val1._value instanceof CrlBool)) {
-      return compileInfo.errorsTable.addError({
+      return compileTools.errorsTable.addError({
         message:
           "Se esperaba una expresion booleana a la izquiera del operador logico.",
         column: this._column,
@@ -53,7 +53,7 @@ export class Logics implements Expression {
         type: 2,
       });
     } else if (!(this._val2._value instanceof CrlBool)) {
-      return compileInfo.errorsTable.addError({
+      return compileTools.errorsTable.addError({
         message:
           "Se esperaba una expresion booleana a la derecha del operador logico.",
         column: this._column,

@@ -1,0 +1,9 @@
+.pill .node {
+  width: fit-content;
+
+  border-radius: 40px;
+}
+
+.pill .node-title {
+  font-style: italic;
+}

@@ -1,5 +1,5 @@
-INT                "-"? \d+ /!\.
-DOUBLE             "-"? \d+ "." \d+
+INT                \d+ /!\.
+DOUBLE             \d+ "." \d+
 
 ID                 [a-zA-Z_$ñ] [\w$ñ]*
 
@@ -32,7 +32,6 @@ const addDedents = (tabs, token) => {
 
 %x comment
 %x string
-%x char
 
 %%
 
@@ -57,7 +56,7 @@ const addDedents = (tabs, token) => {
   }
                    %}
 
-[']                this.pushState('comment');
+"'''"                this.pushState('comment');
 <comment>"'''"     this.popState();
 <comment>$         this.popState(); addDedents(0, 'EOF');
 <comment>[^']+          /**/
@@ -121,17 +120,11 @@ const addDedents = (tabs, token) => {
 <string>["]        this.popState();
 <string>[^"\n]*    return 'STRING_';
 
-<string>\n         addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, 0, yylloc]);
-<string>$          addError.apply(this, [`No se cerro la especificacion del string.`, 0, yylloc]); addDedents(0, 'EOF');
+<string>\n         addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, yylloc, 0]);
+<string>$          addError.apply(this, [`No se cerro la especificacion del string.`, yylloc, 0]); addDedents(0, 'EOF');
 
-[']/!"''"          this.pushState('char');
-<char>[']/!"''"    this.popState();
-<char>"'''"        this.popState(); this.pushState('comment');
-<char>"\"[^'\n]    return 'CHAR_';
-<char>[^'\n]       return 'CHAR_';
-
-<char>\n           addError.apply(this, [`Se ingreso un salto de linea en lugar de un caracter.`, 0, yylloc]); return '\n';
-<char>$            addError.apply(this, [`No se termino la especificacion del caracter.`, 0, yylloc]); addDedents(0, 'EOF');
+['].[']             return 'CHAR_';
+[']\\[a-zA-Z'\][']  return 'CHAR_';
 
 {DOUBLE}           return 'DOUBLE_';
 {INT}              return 'INT_';
@@ -139,4 +132,4 @@ const addDedents = (tabs, token) => {
 {ID}               return 'ID';
 
 $                  addDedents(0, 'EOF');
-.                  addError.apply(this, [`Token desconocido <<${yytext}>>.`, 0, yylloc]);
+[^\n\t ]+          addError.apply(this, [`El token <<${yytext}>> no se reconocio dentro de la gramatica.`, yylloc, 0]);

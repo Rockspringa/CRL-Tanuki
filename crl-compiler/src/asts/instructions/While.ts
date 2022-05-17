@@ -1,15 +1,17 @@
 import {
-  addError,
+  addError, compileTools,
   ControlStatement,
   executeStatements,
   Expression,
   RepresentTree,
   Statement,
 } from "../AbstractTree";
-import { CrlBool, CrlType } from "../../types";
-import {compileInfo, scopeStack} from "../../crl-compiler";
+import { CrlType } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
 
 export class While implements ControlStatement {
+  _executions: number = 0;
+
   readonly _condition: Expression;
   readonly _body: Statement[];
   readonly rep: RepresentTree;
@@ -21,7 +23,7 @@ export class While implements ControlStatement {
 
   constructor(condition: Expression, body: Statement[]) {
     this._condition = condition;
-    this._body = body;
+    this._body = body.filter(stmt => stmt);
 
     this.rep = {
       type: "ControlStatement",
@@ -31,17 +33,17 @@ export class While implements ControlStatement {
         {
           type: "Body",
           represent: "Cuerpo",
-          children: body.map((stmt) => stmt.rep),
+          children: this._body.map((stmt) => stmt.rep),
         },
       ],
     };
   }
 
   execute(): void {
-    scopeStack.push("SubAmbito_Mientras");
+    compileTools.scopeStack.push("SubAmbito_Mientras");
     this._condition.execute();
     if (!this._condition._value) {
-      scopeStack.pop();
+      compileTools.scopeStack.pop();
       return;
     }
 
@@ -53,13 +55,22 @@ export class While implements ControlStatement {
       ) {
         executeStatements(this._body, this);
         this._condition.execute();
+        this._executions++;
+
+        if (this._executions > 1000) {
+          addError(
+            this._condition,
+            "Limite de ejecuciones alcanzado, asegurese el ciclo se pueda romper."
+          );
+          break;
+        }
       }
-      this._break = undefined;
-      this._continue = undefined;
     } catch (e: any) {
       addError(this._condition, e.message);
     }
-    compileInfo.symbolsTable.removeScope(scopeStack.length);
-    scopeStack.pop();
+    this._break = undefined;
+    this._continue = undefined;
+    compileTools.symbolsTable.removeScope(compileTools.scopeStack.length);
+    compileTools.scopeStack.pop();
   }
 }

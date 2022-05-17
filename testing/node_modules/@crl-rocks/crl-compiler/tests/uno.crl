@@ -1,0 +1,61 @@
+!!Aqui estoy declarando una importacion y una incerteza.
+Importar aritmeticas.crl
+Incerteza 0.5
+
+!!Declaro algunas globales
+Int Estado=(0+10-10)^1
+String palabra, palabra1="Hola Mundo"
+palabra1="Adios Mundo"
+
+
+Void Principal():
+	Saludar(palabra, true, true)
+	Saludar(palabra, true, false)
+	Saludar(palabra, false, false)
+	Int resultado=factorial(5)*true
+	Int resultado2=factorial(1)*false
+	Mostrar("El factorial de: {0} es: {1} y el factorial de: {2} por 0 es: {3}",5,resultado,1,resultado2)
+	Imprimir(2,2)
+	DibujarEXP((60+5)*num1)
+	Imprimir2(2,2)
+	Contar(10)
+	DibujarAST(Graficar)
+
+
+
+
+'''
+Salidas esperadas:
+>Dar saludo
+>Hola Mundo
+>Se acabo la funcion
+
+>Sigue en el programa
+>Se acabo la funcion
+
+>Dar despedida
+>Adios Mundo
+>Se acabo el sino
+>Se acabo la funcion
+
+>El factorial de: 5 es: 120 y el factorial de: 1 por 0 es: 0
+
+> Matriz x=1, y=2
+> Matriz x=2, y=2
+
+>Se genero DibujarEXP (Este mensaje es opcional)
+
+> Matriz x=1, y=1
+> Matriz x=2, y=1
+
+>numero 0
+>numero 1
+>numero 2
+>numero 3
+>numero 4
+
+>Se genero el AST de Graficar (Este mensaje es opcional)
+
+
+'''
+

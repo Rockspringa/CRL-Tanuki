@@ -1,22 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
+    "target": "es2017",
+    "module": "commonJS",
     "baseUrl": "./",
     "sourceMap": true,
+    "declarationMap": true,
+    "declarationDir": "./@types",
     "outDir": "./dist",
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
+    "declaration": true,
+    "noImplicitAny": false,
+    "noImplicitOverride": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "lib": [
+      "es2020",
+      "dom"
+    ]
   },
   "exclude": [
-    "node_modules/*"
+    "node_modules",
+    "dist",
+    "tests",
+    "res"
   ],
   "include": [
-    "src/**/*.ts",
-    "src/**/*.js"
+    "src"
   ]
 }

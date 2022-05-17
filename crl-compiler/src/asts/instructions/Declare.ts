@@ -1,18 +1,15 @@
 import {
-  addError,
+  addError, compileTools,
   ExecutableStatement,
   Expression,
   RepresentTree,
 } from "../AbstractTree";
-import {compileInfo, getScopeName, scopeStack} from "../../crl-globals";
-import {
-  CrlBool,
-  CrlChar,
-  CrlDouble,
-  CrlInt,
-  CrlString,
-  Type,
-} from "../../types";
+import { CrlType, Type } from "../../types/CrlType";
+import { CrlDouble } from "../../types/CrlType";
+import { CrlString } from "../../types/CrlType";
+import { CrlChar } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
+import { CrlInt } from "../../types/CrlType";
 
 export class Declare implements ExecutableStatement {
   readonly _column: number;
@@ -61,21 +58,26 @@ export class Declare implements ExecutableStatement {
       return;
     }
     const _val = this._value?._value || this.getDefaultValue();
+    let data: CrlType;
     try {
-      const data = _val.castTo(this._type);
-
-      for (const name of this._names) {
-        compileInfo.symbolsTable.addSymbol({
-          scopeName: getScopeName(),
+      data = _val.castTo(this._type);
+    } catch (e: any) {
+      if (this._value) addError(this._value, e.message);
+      return;
+    }
+    for (const name of this._names) {
+      try {
+        compileTools.symbolsTable.addSymbol({
+          scopeName: compileTools.getScopeName(),
           column: this._column,
-          scope: scopeStack.length,
+          scope: compileTools.scopeStack.length,
           line: this._line,
           data,
           name,
         });
+      } catch (e: any) {
+        addError(this, e.message);
       }
-    } catch (e: any) {
-      if (this._value) addError(this._value, e.message);
     }
   }
 

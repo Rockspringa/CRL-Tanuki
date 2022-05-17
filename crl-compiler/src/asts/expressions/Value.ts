@@ -1,5 +1,6 @@
 import { capitalize, Expression, RepresentTree } from "../AbstractTree";
-import { CrlBool, CrlType, Type } from "../../types";
+import { CrlType, Type } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
 
 export class Value implements Expression {
   readonly _column: number;

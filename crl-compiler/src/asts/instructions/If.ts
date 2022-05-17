@@ -1,15 +1,17 @@
 import {
-  addError,
+  addError, compileTools,
   ControlStatement,
   executeStatements,
   Expression,
   RepresentTree,
   Statement,
 } from "../AbstractTree";
-import { CrlBool, CrlType } from "../../types";
-import {compileInfo, scopeStack} from "../../crl-compiler";
+import { CrlType } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
 
 export class If implements ControlStatement {
+  _executions: number = 0;
+
   readonly _condition: Expression;
   readonly _body: Statement[];
   readonly _elseBody?: Statement[];
@@ -26,8 +28,8 @@ export class If implements ControlStatement {
     elseBody?: Statement[]
   ) {
     this._condition = condition;
-    this._body = body;
-    this._elseBody = elseBody;
+    this._body = body.filter(stmt => stmt);
+    this._elseBody = elseBody?.filter(stmt => stmt);
 
     this.rep = {
       type: "ControlStatement",
@@ -37,11 +39,11 @@ export class If implements ControlStatement {
         {
           type: "Body",
           represent: "Cuerpo",
-          children: body.map((instruct) => instruct.rep),
+          children: this._body.map((instruct) => instruct.rep),
         },
       ],
     };
-    if (elseBody) {
+    if (this._elseBody) {
       this.rep.children?.push({
         type: "Statement",
         represent: "Sino",
@@ -49,7 +51,7 @@ export class If implements ControlStatement {
           {
             type: "Body",
             represent: "Cuerpo",
-            children: elseBody.map((instruct) => instruct.rep),
+            children: this._elseBody.map((instruct) => instruct.rep),
           },
         ],
       });
@@ -57,7 +59,7 @@ export class If implements ControlStatement {
   }
 
   execute(): void {
-    scopeStack.push("SubAmbito_Si");
+    compileTools.scopeStack.push("SubAmbito_Si");
     this._condition.execute();
 
     if (this._condition._value) {
@@ -66,15 +68,15 @@ export class If implements ControlStatement {
         if (condition.value) {
           executeStatements(this._body, this);
         } else if (this._elseBody) {
-          scopeStack.pop();
-          scopeStack.push("SubAmbito_Sino");
+          compileTools.scopeStack.pop();
+          compileTools.scopeStack.push("SubAmbito_Sino");
           executeStatements(this._elseBody, this);
         }
-        compileInfo.symbolsTable.removeScope(scopeStack.length);
+        compileTools.symbolsTable.removeScope(compileTools.scopeStack.length);
       } catch (e: any) {
         addError(this._condition, e.message);
       }
     }
-    scopeStack.pop();
+    compileTools.scopeStack.pop();
   }
 }

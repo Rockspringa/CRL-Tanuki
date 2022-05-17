@@ -1,0 +1,10 @@
+<div [id]="id" class="relative">
+  <div class="title">
+    <h3>Expresion No. {{ index }}</h3>
+  </div>
+  <div [id]="_id" class="pill"></div>
+
+  <div class="btn icon" (click)="downloadGraph.emit()">
+    <span>  Descargar </span>
+  </div>
+</div>

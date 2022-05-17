@@ -1,0 +1,9 @@
+<div class="tab-box">
+  <button [ngClass]="{active}" class="tab btn">
+    {{ tab }}
+  </button>
+
+  <button type="button" class="btn icon" (click)="close.emit()">
+    <span></span>
+  </button>
+</div>

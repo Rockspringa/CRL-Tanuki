@@ -1,0 +1,17 @@
+<div class="principal-container">
+  <div class="title">
+    <h3>Consola de Salida</h3>
+  </div>
+  <textarea
+    class="principal"
+    name="console"
+    id="console"
+    [value]="console"
+    readonly
+  ></textarea>
+
+  <div id="tool-bar">
+    <app-redirect-buttons [dataBunch]="refs"></app-redirect-buttons>
+    <!--code and graphs-->
+  </div>
+</div>

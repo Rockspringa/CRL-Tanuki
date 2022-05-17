@@ -1,0 +1,110 @@
+.cm-s-ambiance span.cm-number {
+  color: var(--yellow);
+}
+
+.cm-s-ambiance span.cm-string,
+.cm-s-ambiance span.cm-atom {
+  color: var(--green);
+}
+
+.cm-s-ambiance {
+  font-family: 'JetBrains Mono', Consolas, 'DejaVu Sans Mono', monospace !important;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.cm-s-ambiance span.cm-comment {
+  color: var(--gray);
+  font-style: italic;
+  line-height: 1em;
+}
+
+.cm-s-ambiance span.cm-meta {
+  color: var(--cyan);
+  font-style: italic;
+  line-height: 1em;
+}
+
+.cm-s-ambiance span.cm-variable {
+  color: var(--cyan);
+}
+
+.cm-s-ambiance span.cm-variable-2 {
+  color: var(--red);
+}
+
+.cm-s-ambiance span.cm-qualifier {
+  color: var(--blue);
+}
+
+.cm-s-ambiance span.cm-keyword {
+  color: var(--violet);
+}
+
+.cm-s-ambiance span.cm-builtin {
+  color: var(--violet);
+}
+
+.cm-s-ambiance span.cm-link {
+  color: var(--cyan);
+}
+
+.cm-s-ambiance span.cm-error {
+  background-color: var(--red);
+  font-style: italic;
+  line-height: 1em;
+}
+
+.cm-s-ambiance .CodeMirror-activeline-background {
+  background: var(--black);
+}
+
+.cm-s-ambiance .CodeMirror-matchingbracket {
+  outline: 1px solid var(--gray);
+  color: var(--black) !important;
+}
+
+.cm-s-ambiance.CodeMirror {
+  line-height: 1.40em;
+  color: white;
+  background-color: var(--black);
+  box-shadow: inset 0 0 10px var(--black);
+}
+
+.cm-s-ambiance .CodeMirror-gutters {
+  background: var(--black);
+  border-right: 1px solid black;
+  box-shadow: 0 2px 5px var(--gray);
+}
+
+.cm-s-ambiance .CodeMirror-linenumber {
+  color: var(--black);
+  font-weight: bolder;
+  padding: 0 5px;
+  background-color: var(--cyan);
+}
+
+.cm-s-ambiance .CodeMirror-linenumbers {
+  background-color: var(--cyan);
+}
+
+.cm-s-ambiance .CodeMirror-guttermarker {
+  color: var(--gray);
+}
+
+.cm-s-ambiance .CodeMirror-guttermarker-subtle {
+  color: var(--gray);
+}
+
+.cm-s-ambiance .CodeMirror-cursor {
+  border-left: 2px solid var(--blue);
+}
+
+.CodeMirror-selected {
+  background-color: var(--cyan) !important;
+}
+
+.CodeMirror {
+  height: 100% !important;
+  border: 2px solid var(--cyan);
+}

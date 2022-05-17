@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "codemirror"
+            ],
             "outputPath": "dist/crl-tanuki",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -27,9 +30,17 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "./src/styles.css",
+              "./src/assets/css/codemirror.css",
+              "./src/assets/css/Treant.css",
+              "./node_modules/codemirror/lib/codemirror.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./src/assets/js/raphael.js",
+              "./src/assets/js/Treant.js",
+              "./node_modules/codemirror/lib/codemirror.js",
+              "./node_modules/codemirror/addon/mode/simple.js"
+            ]
           },
           "configurations": {
             "production": {

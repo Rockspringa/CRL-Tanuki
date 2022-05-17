@@ -1,0 +1,42 @@
+<div class="principal-container">
+  <div class="title">
+    <h3>Graficas de Salida</h3>
+  </div>
+
+  <div class="principal">
+    <ng-container *ngFor="let graph of graphs; index as index">
+      <ng-container [ngSwitch]="getType(graph)">
+        <app-functions
+          [id]="'graph-' + index"
+          *ngSwitchCase="0"
+          [functions]="getFunctionTree(graph)"
+          [index]="index"
+          (downloadGraph)="takePicture('graph-' + index)"
+        ></app-functions>
+
+        <app-expressions
+          [id]="'graph-' + index"
+          *ngSwitchCase="1"
+          [expression]="getExpressionTree(graph)"
+          [_id]="getExpressionId(index)"
+          [index]="index"
+          (downloadGraph)="takePicture('graph-' + index)"
+        ></app-expressions>
+
+        <app-scope-symbols
+          [id]="'graph-' + index"
+          *ngSwitchDefault
+          [scopeSymbols]="getScopeSymbolsTable(graph)"
+          (downloadGraph)="takePicture('graph-' + index)"
+        ></app-scope-symbols>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <div id="tool-bar">
+    <app-redirect-buttons [dataBunch]="refs"></app-redirect-buttons>
+    <!--code and graphs-->
+  </div>
+
+  <a id="downloader" [download]="filename" hidden></a>
+</div>

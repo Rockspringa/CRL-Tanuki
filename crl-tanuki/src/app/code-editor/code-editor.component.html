@@ -1,0 +1,33 @@
+<div>
+  <div class="title">
+    <h3>Editor de Codigo CRL</h3>
+  </div>
+
+  <app-tabs
+    [tabs]="tabs"
+    (open)="openTab($event)"
+    (close)="deleteTab($event)"
+    (addTab)="addTab()"
+    (addFiles)="addTabs($event)"
+    (renameFile)="renameTab($event)"
+  ></app-tabs>
+
+  <app-editor
+    *ngIf="activeTab; else notFound"
+    [tab]="activeTab"
+    (downloadFile)="downloadFile()"
+    (buildCode)="buildCode()"
+  ></app-editor>
+
+  <ng-template #notFound>
+    <div class="principal">
+      <img
+        src="/assets/images/not%20found.svg"
+        alt="Code Not Found"
+        loading="lazy"
+      />
+    </div>
+  </ng-template>
+
+  <a id="downloader" [download]="this.activeTab?.name" hidden></a>
+</div>

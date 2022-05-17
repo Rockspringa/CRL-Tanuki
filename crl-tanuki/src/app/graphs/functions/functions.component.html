@@ -1,0 +1,13 @@
+<div [id]="id" class="relative">
+  <div class="title">
+    <h3>Funciones '{{ functions.functionName }}'</h3>
+  </div>
+
+  <ng-container *ngFor="let ast of functions.functions; index as index">
+    <app-function-ast [functionInfo]="ast" [id]="getId(index)"></app-function-ast>
+  </ng-container>
+
+  <div class="btn icon" (click)="downloadGraph.emit()">
+    <span>  Descargar </span>
+  </div>
+</div>

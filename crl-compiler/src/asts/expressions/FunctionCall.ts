@@ -1,15 +1,15 @@
 import {
   addError,
   capitalize,
+  compileTools,
   ExecutableStatement,
   executeStatements,
   Expression,
   RepresentTree,
 } from "../AbstractTree";
-import {compileInfo, executeFunction, getScopeName, scopeStack} from "../../crl-globals";
-import {Variable} from "../../containers";
-import {CrlType, Type} from "../../types";
-import {Reference} from "./Reference";
+import { Reference } from "./Reference";
+import { CrlType, Type } from "../../types/CrlType";
+import { Variable } from "../../containers/symbols-table";
 
 export class FunctionCall implements Expression, ExecutableStatement {
   static readonly specialFunctions = [
@@ -29,7 +29,7 @@ export class FunctionCall implements Expression, ExecutableStatement {
   constructor(
     func: { name: string; params: Expression[] },
     column: number,
-    line: number,
+    line: number
   ) {
     this._column = column;
     this._func = func;
@@ -42,29 +42,41 @@ export class FunctionCall implements Expression, ExecutableStatement {
   }
 
   execute(): void {
+    if (compileTools.scopeStack.length > 1000) {
+      return addError(
+        this,
+        "Limite de ambito alcanzado, asegurese que la recursion tenga un limite."
+      );
+    }
     const values: CrlType[] = [];
     const vars: Variable[] = [];
 
-    scopeStack.push(`Funcion_${this._func.name}`);
-    if (!FunctionCall.specialFunctions.includes(this._func.name) || this._func.name === "Mostrar") {
+    compileTools.scopeStack.push(`Funcion_${this._func.name}`);
+    if (
+      !FunctionCall.specialFunctions.includes(this._func.name) ||
+      this._func.name === "Mostrar"
+    ) {
       for (const _var of this._func.params) {
         _var.execute();
 
         if (!_var._value) {
-          scopeStack.pop();
+          compileTools.scopeStack.pop();
           return;
         }
-        vars.push({name: `${vars.length}`, type: _var._value.type});
+        vars.push({ name: `${vars.length}`, type: _var._value.type });
         values.push(_var._value);
       }
     }
 
     if (FunctionCall.specialFunctions.includes(this._func.name)) {
       this.executeDefaultFunctions(this._func.name, values);
-      scopeStack.pop();
+      compileTools.scopeStack.pop();
       return;
     }
-    const _func = compileInfo.functionsTable.getFunction(this._func.name, vars);
+    const _func = compileTools.functionsTable.getFunction(
+      this._func.name,
+      vars
+    );
     const paramsJoined = vars
       .map((_var) => capitalize(Type[_var.type]))
       .join(", ");
@@ -73,11 +85,13 @@ export class FunctionCall implements Expression, ExecutableStatement {
         this,
         `No se encontro la funcion ${this._func.name} con los parametros '${paramsJoined}'.`
       );
-      scopeStack.pop();
+      compileTools.scopeStack.pop();
       return;
     }
     this.addParamsToSymbolsTable(_func.params, values);
-    executeFunction(_func.file, () => executeStatements(_func.body, this));
+    compileTools.executeFunction(_func.file, () =>
+      executeStatements(_func.body, this)
+    );
 
     if (this._return) {
       if (!_func.type) {
@@ -85,7 +99,7 @@ export class FunctionCall implements Expression, ExecutableStatement {
           this,
           `La ${this._func.name} con los parametros '${paramsJoined}' es de tipo void pero retorna un valor.`
         );
-      }else {
+      } else {
         try {
           this._value = this._return.castTo(_func.type);
         } catch (e: any) {
@@ -93,7 +107,7 @@ export class FunctionCall implements Expression, ExecutableStatement {
           addError(
             this,
             e.message +
-            ` en el retorno de la funcion ${this._func.name} con los parametros '${paramsJoined}'.`
+              ` en el retorno de la funcion ${this._func.name} con los parametros '${paramsJoined}'.`
           );
         }
       }
@@ -108,50 +122,67 @@ export class FunctionCall implements Expression, ExecutableStatement {
         1
       );
     }
-    compileInfo.symbolsTable.removeScope(scopeStack.length);
-    scopeStack.pop();
+    compileTools.symbolsTable.removeScope(compileTools.scopeStack.length);
+    compileTools.scopeStack.pop();
   }
 
   private executeDefaultFunctions(func: string, values: CrlType[]) {
     switch (func) {
       case "Mostrar":
         if (!values.length) {
-          return addError(this, "La funcion 'Mostrar' necesita, al menos, un parametro.");
+          return addError(
+            this,
+            "La funcion 'Mostrar' necesita, al menos, un parametro."
+          );
         }
         let out = values[0].toString();
         for (let i = 1; i < values.length; i++) {
           out = out.replace(`{${i - 1}}`, values[i].toString());
         }
-        compileInfo.consoleOut.addMessage(out);
+        compileTools.consoleOut.addMessage(out);
         break;
 
       case "DibujarAST":
-        if (this._func.params.length === 1 && !(this._func.params[0] instanceof Reference)) {
-          return addError(this, "La funcion 'DibujarAST' solo acepta un unico parametro de tipo id.");
+        if (
+          this._func.params.length === 1 &&
+          !(this._func.params[0] instanceof Reference)
+        ) {
+          return addError(
+            this,
+            "La funcion 'DibujarAST' solo acepta un unico parametro de tipo id."
+          );
         }
         const name = (this._func.params[0] as Reference)._name;
-        const functions: RepresentTree[] = compileInfo.functionsTable
+        const functions: RepresentTree[] = compileTools.functionsTable
           .getFunctions(name)
           .map((func) => {
-            const vars = func.params.map((param) => Type[param.type]).join(", ");
+            const vars = func.params
+              .map((param) => Type[param.type])
+              .join(", ");
             return {
               type: "Function",
-              represent: `${func.type ? Type[func.type] : "Void"} : ${name}( ${vars} )`,
+              represent: `${
+                func.type ? Type[func.type] : "Void"
+              } : ${name}( ${vars} )`,
               children: func.body.map((stmt) => stmt.rep),
             };
           });
-        compileInfo.graphsOut.addGraph({functions, functionName: name});
+        compileTools.graphsOut.addGraph({ functions, functionName: name });
         break;
 
       case "DibujarTS":
-        compileInfo.graphsOut.addGraph({
-          symbols: compileInfo.symbolsTable.getScope(scopeStack.length),
-          scopeName: getScopeName(),
+        compileTools.scopeStack.pop();
+        compileTools.graphsOut.addGraph({
+          symbols: compileTools.symbolsTable.getScope(
+            compileTools.scopeStack.length
+          ),
+          scopeName: compileTools.getScopeName(),
         });
+        compileTools.scopeStack.push("Provisional");
         break;
 
       default:
-        compileInfo.graphsOut.addGraph({
+        compileTools.graphsOut.addGraph({
           expression: this._func.params[0].rep,
         });
     }
@@ -160,9 +191,9 @@ export class FunctionCall implements Expression, ExecutableStatement {
   private addParamsToSymbolsTable(params: Variable[], values: CrlType[]) {
     for (let i = 0; i < params.length; i++) {
       try {
-        compileInfo.symbolsTable.addSymbol({
-          scopeName: getScopeName(),
-          scope: scopeStack.length,
+        compileTools.symbolsTable.addSymbol({
+          scopeName: compileTools.getScopeName(),
+          scope: compileTools.scopeStack.length,
           name: params[i].name,
           line: this._func.params[i]._line,
           column: this._func.params[i]._column,

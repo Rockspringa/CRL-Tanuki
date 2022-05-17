@@ -1,1 +1,235 @@
-/* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: "icons";
+  src: url("./assets/font/icons.eot?34436732");
+  src: url("./assets/font/icons.eot?34436732#iefix") format("embedded-opentype"),
+  url("./assets/font/icons.woff?34436732") format("woff"),
+  url("./assets/font/icons.ttf?34436732") format("truetype"),
+  url("./assets/font/icons.svg?34436732#icons") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+element,
+html,
+textarea {
+  --black: #2b2c34;
+  --dark-gray: #28283c;
+  --red: #e06c75;
+  --green: #98c379;
+  --yellow: #e5c07b;
+  --blue: #61afef;
+  --violet: #c678dd;
+  --cyan: #56b6c2;
+  --gray: #abb2bf;
+
+  color: var(--gray);
+  background-color: var(--black);
+
+  font-family: 'JetBrains Mono', Consolas, 'DejaVu Sans Mono', monospace !important;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background: var(--dark-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray);
+  opacity: 0.5;
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.principal {
+  font-weight: 400;
+  font-size: 14px;
+
+  width: 100% !important;
+  aspect-ratio: 101/50;
+  overflow: auto;
+
+  border: 2px solid var(--cyan);
+  box-sizing: border-box;
+
+  color: var(--gray);
+  background-color: var(--dark-gray);
+}
+
+.principal-container {
+  width: 100% !important;
+  aspect-ratio: 11/5;
+  border: none;
+  background-color: var(--dark-gray);
+}
+
+#tool-bar {
+  height: fit-content;
+
+  padding: 0 10px;
+
+  background-color: var(--dark-gray);
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+input:focus, textarea:focus {
+  outline: none !important;
+}
+
+.icon {
+  font-family: "icons", serif;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: fit-content;
+  text-align: center;
+}
+
+.btn {
+  height: 27px;
+  width: fit-content;
+
+  border: none;
+  border-bottom: 2px solid var(--dark-gray);
+  margin: auto 3px;
+  padding: 0 3px;
+
+  color: var(--gray);
+  opacity: 0.4;
+  background-color: transparent;
+
+  transition: opacity;
+  transition-duration: 500ms;
+}
+
+.btn:hover {
+  opacity: 1;
+  cursor: pointer;
+
+  border-bottom-color: var(--violet);
+
+  color: var(--cyan);
+  background-color: var(--dark-gray);
+}
+
+.btn.with-state {
+  font-size: medium;
+
+  opacity: 0.75;
+
+  background-color: var(--dark-gray);
+  transition: color;
+  transition-duration: 500ms;
+}
+
+.btn.with-state:hover {
+  color: var(--violet) !important;
+  border-bottom-color: var(--violet) !important;
+}
+
+.btn.with-state.accepted {
+  border-bottom-color: var(--green);
+  color: var(--green);
+}
+
+.btn.with-state.rejected {
+  border-bottom-color: var(--red);
+  color: var(--red);
+}
+
+table {
+  background-color: var(--black);
+  width: 100%;
+}
+
+thead {
+  height: fit-content;
+  padding: 5px 0;
+  position: sticky;
+  top: 2px;
+}
+
+tbody {
+  margin: 0 0 auto 0;
+  text-align: center;
+
+  color: var(--cyan);
+  border: 1px solid var(--dark-gray);
+  background-color: var(--dark-gray);
+}
+
+th {
+  background-color: var(--yellow);
+}
+
+td {
+  text-align: center;
+  font-weight: bolder;
+
+  border: 1px solid var(--dark-gray);
+  color: var(--black);
+  background-color: var(--blue);
+}
+
+th, .title {
+  font-family: 'Roboto Slab', serif !important;
+  font-weight: bolder;
+  text-align: center;
+
+  color: var(--dark-gray);
+  border: 1px solid var(--black);
+}
+
+.title {
+  position: relative;
+
+  padding: 4px 0;
+  margin-bottom: 5px;
+
+  background-color: var(--cyan);
+}
+
+.title * {
+  margin: 0;
+}
+
+.principal .title {
+  padding: 2px;
+  margin: 1px 2px;
+
+  background-color: var(--green);
+}
+
+.node {
+  padding: 5px;
+
+  font-weight: bold;
+  text-align: center;
+
+  border: 1px solid var(--cyan);
+  color: var(--dark-gray);
+  background-color: var(--cyan);
+}
+
+.node p {
+  margin: 0;
+}
+
+svg path {
+  stroke: var(--cyan);
+  stroke-width: 2px;
+}
+
+.relative {
+  position: relative;
+}
+
+.relative .btn {
+  position: absolute;
+
+  bottom: 10px;
+  right: 10px;
+}

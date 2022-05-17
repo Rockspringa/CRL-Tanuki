@@ -1,0 +1,25 @@
+<div [id]="id" class="relative">
+  <table>
+    <caption class="title">
+      <h3>Ambito: {{ scopeSymbols.scopeName }}</h3>
+    </caption>
+
+    <thead>
+      <th>Linea</th>
+      <th>Columna</th>
+      <th>Variable</th>
+      <th>Tipo</th>
+      <th>Valor</th>
+    </thead>
+
+    <tbody>
+      <ng-container *ngFor="let symbol of scopeSymbols.symbols">
+        <tr app-symbol [symbol]="symbol"></tr>
+      </ng-container>
+    </tbody>
+  </table>
+
+  <div class="btn icon" (click)="downloadGraph.emit()">
+    <span>  Descargar </span>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+#tool-bar div {
+  width: 10px;
+}
+
+#cursor {
+  font-family: 'JetBrains Mono', Consolas, 'DejaVu Sans Mono', monospace;
+
+  font-size: medium;
+
+  background-color: var(--dark-gray);
+}
+
+:host, :host > div {
+  display: block;
+  border: none;
+}

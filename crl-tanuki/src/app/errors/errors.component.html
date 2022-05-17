@@ -1,0 +1,29 @@
+<div class="principal-container">
+  <div class="title">
+    <h3>Errores de Compilacion</h3>
+  </div>
+
+  <div class="principal">
+    <table>
+      <thead>
+        <th>Linea</th>
+        <th>Columna</th>
+        <th>Archivo</th>
+        <th>Tipo</th>
+        <th>Causa</th>
+        <th>Ambito</th>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let error of errors">
+          <tr app-single-error [error]="error"></tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="tool-bar">
+    <app-redirect-buttons [dataBunch]="refs"></app-redirect-buttons>
+    <!--code-->
+  </div>
+</div>

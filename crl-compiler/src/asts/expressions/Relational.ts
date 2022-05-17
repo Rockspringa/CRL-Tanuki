@@ -1,6 +1,6 @@
-import { Expression, RepresentTree } from "../AbstractTree";
-import { compileInfo } from "../../crl-globals";
-import { CrlBool, CrlNumber, CrlType } from "../../types";
+import { compileTools, Expression, RepresentTree } from "../AbstractTree";
+import { CrlNumber, CrlType } from "../../types/CrlType";
+import { CrlBool } from "../../types/CrlType";
 
 enum RelationalOperator {
   EQUAL,
@@ -37,7 +37,7 @@ export class Relational implements Expression {
 
     this.rep = {
       type: "Relacional",
-      represent: this.getSymbol(),
+      represent: this._getSymbol(),
       children: [val1.rep, val2.rep],
     };
   }
@@ -48,7 +48,7 @@ export class Relational implements Expression {
 
     if (!(this._val1._value && this._val2._value)) return;
     if (this._val1._value.constructor !== this._val2._value.constructor) {
-      return compileInfo.errorsTable.addError({
+      return compileTools.errorsTable.addError({
         message:
           "No se pueden comparar las expresiones porque son de diferente tipo.",
         column: this._column,
@@ -96,8 +96,8 @@ export class Relational implements Expression {
           this._value = new CrlBool(
             +(
               Math.abs(val2 - val1) <=
-              +compileInfo.symbolsTable
-                .getSymbol(`__inc_${compileInfo.filename}`, 0)
+              +compileTools.symbolsTable
+                .getSymbol(`__inc_${compileTools.filename}`, 0)
                 .data.toString()
             )
           );
@@ -114,7 +114,7 @@ export class Relational implements Expression {
     }
   }
 
-  private getSymbol() {
+  private _getSymbol() {
     switch (this._operator) {
       case 0: // EQUAL
         return "==";

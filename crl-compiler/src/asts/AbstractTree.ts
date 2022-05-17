@@ -1,5 +1,10 @@
-import { compileInfo } from "../crl-globals";
-import { CrlType } from "../types";
+import { CrlType } from "../types/CrlType";
+
+export let compileTools: any;
+
+export const setCompileTools = (ci: any) => {
+  compileTools = ci;
+}
 
 export interface AbstractTree {
   rep: RepresentTree;
@@ -33,6 +38,8 @@ export interface ExecutableStatement extends AbstractTree {
 }
 
 export interface ControlStatement extends Statement {
+  _executions: number;
+
   _body: Statement[];
   _break?: boolean;
   _return?: CrlType;
@@ -65,7 +72,7 @@ export const addError = (
   msg: string,
   type: number = 2
 ): void => {
-  compileInfo.errorsTable.addError({
+  compileTools.errorsTable.addError({
     message: msg,
     column: _this._column,
     line: _this._line,

@@ -1,0 +1,13 @@
+:host {
+    height: fit-content;
+    display: block;
+}
+
+#downloader {
+    visibility: hidden;
+}
+
+div.principal {
+    display: flex;
+    justify-content: center;
+}

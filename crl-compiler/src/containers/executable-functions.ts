@@ -1,9 +1,8 @@
+import { Type } from "../types/CrlType";
+import { Variable } from "./symbols-table";
 import { Statement } from "../asts/AbstractTree";
-import { compileInfo } from "../crl-globals";
-import { Type } from "../types";
-import { Variable } from "./";
 
-export interface Function {
+export interface CrlFunction {
   name: string;
   params: Variable[];
   body: Statement[];
@@ -12,14 +11,21 @@ export interface Function {
 }
 
 export class FunctionsTable {
-  private functions: Function[] = [];
+  private functions: CrlFunction[] = [];
+  private readonly addError: Function;
+  private readonly getFilename: Function;
 
-  getFunctions(name: string): Function[] {
-    return this.functions.filter((func: Function) => func.name === name);
+  constructor(_addError: Function, _getFilename: Function) {
+    this.addError = _addError;
+    this.getFilename = _getFilename;
   }
 
-  getFunction(name: string, params: Variable[]): Function | undefined {
-    return this.functions.find((func: Function) => {
+  getFunctions(name: string): CrlFunction[] {
+    return this.functions.filter((func: CrlFunction) => func.name === name);
+  }
+
+  getFunction(name: string, params: Variable[]): CrlFunction | undefined {
+    return this.functions.find((func: CrlFunction) => {
       if (func.name === name && func.params.length === params.length) {
         for (let i: number = 0; i < params.length; i++) {
           if (params[i].type !== func.params[i].type) return false;
@@ -30,9 +36,9 @@ export class FunctionsTable {
     });
   }
 
-  addFunction(data: Function, column: number, line: number): void {
+  addFunction(data: CrlFunction, column: number, line: number): void {
     if (this.getFunction(data.name, [...data.params])) {
-      return compileInfo.errorsTable.addError({
+      return this.addError({
         message: `La funcion '${data.name}' no se pudo sobrecargar porque ya existe.`,
         column,
         line,
@@ -40,7 +46,7 @@ export class FunctionsTable {
       });
     }
     if (data.name in ["Mostrar", "DibujarTS", "DibujarAST", "DibujarEXP"]) {
-      return compileInfo.errorsTable.addError({
+      return this.addError({
         message: `La funcion '${data.name}' no se pudo sobrecargar porque tiene el mismo nombre que las funciones por defecto.`,
         column,
         line,
@@ -58,7 +64,8 @@ export class FunctionsTable {
     //     type: 2,
     //   });
     // }
-    data.file = compileInfo.filename;
+    data.file = this.getFilename();
+    data.body = data.body.filter(stmt => stmt);
     this.functions.push(data);
   }
 }
