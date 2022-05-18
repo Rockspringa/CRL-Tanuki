@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "es2020",
+    "module": "commonJS",
     "baseUrl": "./",
     "sourceMap": true,
     "declarationMap": true,
@@ -15,10 +15,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "lib": [
-      "es2020",
-      "dom"
-    ]
   },
   "exclude": [
     "node_modules",
@@ -27,6 +23,6 @@
     "res"
   ],
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

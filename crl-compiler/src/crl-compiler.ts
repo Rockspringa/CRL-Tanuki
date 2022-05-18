@@ -30,7 +30,7 @@ export const executeFunction = (filename: string, callback: Function) => {
 };
 
 export const parseImport = (filename: string, column: number, line: number) => {
-  if (filename in readFiles) {
+  if (readFiles.find(file => file === filename)) {
     return compileInfo.errorsTable.addError({
       message: "Se detecto una referencia circular en los archivos importados.",
       type: 2,

@@ -25,7 +25,7 @@ const executeFunction = (filename, callback) => {
 };
 exports.executeFunction = executeFunction;
 const parseImport = (filename, column, line) => {
-    if (filename in readFiles) {
+    if (readFiles.find(file => file === filename)) {
         return compileInfo.errorsTable.addError({
             message: "Se detecto una referencia circular en los archivos importados.",
             type: 2,
@@ -58,7 +58,7 @@ const parse = (filename, code, _files) => {
         symbolsTable: new symbols_table_1.SymbolsTable(),
         functionsTable: new executable_functions_1.FunctionsTable(addError, getFilename),
     };
-    readFiles = [];
+    readFiles = [filename];
     setPropertiesToSupportElements();
     commonParse(filename, code);
     executePrincipal();
