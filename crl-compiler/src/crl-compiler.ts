@@ -68,7 +68,7 @@ export const parse = (
     symbolsTable: new SymbolsTable(),
     functionsTable: new FunctionsTable(addError, getFilename),
   };
-  readFiles = [];
+  readFiles = [filename];
 
   setPropertiesToSupportElements();
   commonParse(filename, code);
