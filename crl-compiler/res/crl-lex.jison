@@ -120,8 +120,8 @@ const addDedents = (tabs, token) => {
 <string>["]        this.popState();
 <string>[^"\n]*    return 'STRING_';
 
-<string>\n         addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, yylloc, 0]);
-<string>$          addError.apply(this, [`No se cerro la especificacion del string.`, yylloc, 0]); addDedents(0, 'EOF');
+<string>\n         this.popState(); addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, yylloc, 0]);
+<string>$          this.popState(); addError.apply(this, [`No se cerro la especificacion del string.`, yylloc, 0]); addDedents(0, 'EOF');
 
 ['].[']             return 'CHAR_';
 [']\\[a-zA-Z'\][']  return 'CHAR_';

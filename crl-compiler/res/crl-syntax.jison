@@ -74,7 +74,7 @@ body
 
 func_declaration
   : declaration '(' func_param? ')'
-    -> { ...$declaration, params: $3 || [] }
+    { if ($declaration) $$ = { ...$declaration, params: $3 || [] }; }
   | VOID ID '(' func_param? ')'
     -> { name: $2, params: $4 || [] }
   | declaration '(' error
@@ -89,18 +89,21 @@ func_declaration
 
 func_param
   : func_param ',' declaration
-    -> $1; $1.push($declaration)
+    -> $1; if ($1 && $declaration) $1.push($declaration)
   | declaration
-    -> [$declaration]
+    -> ($declaration) ? [$declaration] : []
   | func_param ',' error
-    -> $1; addError.apply({ yy }, ["Se esperaba una tipo.", @3])
+    -> $1; addError.apply({ yy }, ["Se esperaba el tipo del parametro.", @3])
   | func_param error
     -> $1; addError.apply({ yy }, ["Se esperaba una coma.", @2])
   ;
 
 for
   : PARA '(' INT ID '=' exp ';' exp ';' ('++' | '--') ')' loop_block
-    -> ($loop_block) ? new yy.For(new yy.Declare({ type: 2, names: [$4], value: $exp }, @3.first_column + 1, @3.first_line), $exp2, $10 === "++", $loop_block) : undefined
+    {
+    if ($exp1 && $exp2)
+      $$ = new yy.For(new yy.Declare({ type: 2, names: [$4], value: $exp }, @3.first_column + 1, @3.first_line), $exp2, $10 === "++", $loop_block);
+    }
   | PARA '(' INT ID '=' exp ';' exp ';' error
     -> addError.apply({ yy }, ["Se esperaba '++' o un '--' seguidos por ')' y ':'", @10])
   | PARA '(' INT ID '=' exp ';' exp error
@@ -123,7 +126,7 @@ for
 
 while
   : MIENTRAS '(' exp ')' loop_block
-    -> ($loop_block) ? new yy.While($exp, $loop_block) : undefined
+    { if ($exp) $$ = new yy.While($exp, $loop_block); }
   | MIENTRAS '(' exp ')' error
     -> addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", @5])
   | MIENTRAS '(' exp error
@@ -136,7 +139,7 @@ while
 
 if_normal
   : SI '(' exp ')' block else_normal?
-    -> ($block) ? new yy.If($exp, $block, $6) : undefined
+    { if ($exp) $$ = new yy.If($exp, $block, $6); }
   | SI '(' exp ')' error else_normal?
     -> addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", @5])
   | SI '(' exp error else_normal?
@@ -156,7 +159,7 @@ else_normal
 
 if_loop
   : SI '(' exp ')' loop_block else_loop?
-    -> ($loop_block) ? new yy.If($exp, $loop_block, $6) : undefined
+    { if ($exp) $$ = new yy.If($exp, $loop_block, $6); }
   | SI '(' exp ')' error else_loop?
     -> addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", @5])
   | SI '(' exp error else_loop?
@@ -178,9 +181,9 @@ block
   : ':' '\n' '\t' instruction+ '!\t'
     -> $4
   | ':' '\n' error
-    -> addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", @3])
+    -> []; addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", @3])
   | ':' error
-    -> addError.apply({ yy }, ["Se esperaba un salto de linea.", @2])
+    -> []; addError.apply({ yy }, ["Se esperaba un salto de linea.", @2])
   ;
 
 instruction
@@ -198,9 +201,9 @@ loop_block
   : ':' '\n' '\t' loop_instruction+ '!\t'
     -> $4
   | ':' '\n' error
-    -> addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", @3])
+    -> []; addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", @3])
   | ':' error
-    -> addError.apply({ yy }, ["Se esperaba un salto de linea.", @2])
+    -> []; addError.apply({ yy }, ["Se esperaba un salto de linea.", @2])
   ;
 
 loop_instruction
@@ -220,7 +223,7 @@ loop_instruction
 
 var_declaration
   : declaration extra_declare* declaration_assign?
-    -> new yy.Declare({ type: $1.type, names: [$1.name].concat($2), value: $3 }, @1.first_column + 1, @1.first_line)
+    { if ($1) $$ = new yy.Declare({ type: $1.type, names: [$1.name].concat($2 || []), value: $3 }, @1.first_column + 1, @1.first_line); }
   ;
 
 extra_declare
@@ -232,14 +235,14 @@ extra_declare
 
 declaration_assign
   : '=' exp
-    -> $exp
+    { if ($exp) $$ = $exp; }
   | '=' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @2])
   ;
 
 assign
   : ID '=' exp
-    -> new yy.Assign($1, $exp, @1.first_column + 1, @1.first_line)
+    { if ($exp) $$ = new yy.Assign($1, $exp, @1.first_column + 1, @1.first_line); }
   | ID '=' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   ;
@@ -265,9 +268,9 @@ function
 
 func_values
   : func_values ',' exp
-    -> $1; $1.push($exp)
+    -> $1; if ($exp) $1.push($exp)
   | exp
-    -> [$exp]
+    -> $exp ? [$exp] : []
   | func_values ',' error
     -> $1; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | func_values error
@@ -322,17 +325,17 @@ exp
   | '(' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @2])
   | exp '+' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '-' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '*' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '/' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '%' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '^' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '==' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '!=' error
@@ -348,11 +351,11 @@ exp
   | exp '~' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '&&' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '||' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | exp '|&' error
-    -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
+    -> $exp; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @3])
   | '!' error
     -> addError.apply({ yy }, ["Se esperaba una expresion o un valor.", @2])
   | '-' error %prec UNARY

@@ -123,7 +123,7 @@ case 16:
  addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", _$[$0]]); 
 break;
 case 17:
-this.$ = { ...$$[$0-3], params: $$[$0-1] || [] };
+ if ($$[$0-3]) this.$ = { ...$$[$0-3], params: $$[$0-1] || [] }; 
 break;
 case 18:
 this.$ = { name: $$[$0-3], params: $$[$0-1] || [] };
@@ -137,20 +137,23 @@ break;
 case 22:
 this.$ = addError.apply({ yy }, ["Se esperaba un identificador", _$[$0]]);
 break;
-case 23: case 84:
-this.$ = $$[$0-2]; $$[$0-2].push($$[$0]);
+case 23:
+this.$ = $$[$0-2]; if ($$[$0-2] && $$[$0]) $$[$0-2].push($$[$0]);
 break;
-case 24: case 85: case 142: case 148: case 150: case 154: case 160: case 188: case 194: case 199: case 205: case 207: case 209:
-this.$ = [$$[$0]];
+case 24:
+this.$ = ($$[$0]) ? [$$[$0]] : [];
 break;
 case 25:
-this.$ = $$[$0-2]; addError.apply({ yy }, ["Se esperaba una tipo.", _$[$0]]);
+this.$ = $$[$0-2]; addError.apply({ yy }, ["Se esperaba el tipo del parametro.", _$[$0]]);
 break;
 case 26:
 this.$ = $$[$0-1]; addError.apply({ yy }, ["Se esperaba una coma.", _$[$0]]);
 break;
 case 27:
-this.$ = ($$[$0]) ? new yy.For(new yy.Declare({ type: 2, names: [$$[$0-8]], value: $$[$0-6] }, _$[$0-9].first_column + 1, _$[$0-9].first_line), $$[$0-4], $$[$0-2] === "++", $$[$0]) : undefined;
+
+    if ($$[$0-6] && $$[$0-4])
+      this.$ = new yy.For(new yy.Declare({ type: 2, names: [$$[$0-8]], value: $$[$0-6] }, _$[$0-9].first_column + 1, _$[$0-9].first_line), $$[$0-4], $$[$0-2] === "++", $$[$0]);
+    
 break;
 case 28:
 this.$ = addError.apply({ yy }, ["Se esperaba '++' o un '--' seguidos por ')' y ':'", _$[$0]]);
@@ -158,7 +161,7 @@ break;
 case 29:
 this.$ = addError.apply({ yy }, ["Se esperaba un signo de punto y coma, un operador aritmetico, un operador de comparacion o un operador logico.", _$[$0]]);
 break;
-case 30: case 32: case 76: case 78: case 110: case 111: case 112: case 113: case 114: case 115: case 116: case 117: case 118: case 119: case 120: case 121: case 122: case 123: case 124: case 125: case 126: case 127: case 128:
+case 30: case 32: case 76: case 78: case 110: case 117: case 118: case 119: case 120: case 121: case 122: case 123: case 127: case 128:
 this.$ = addError.apply({ yy }, ["Se esperaba una expresion o un valor.", _$[$0]]);
 break;
 case 31:
@@ -174,7 +177,7 @@ case 35:
 this.$ = addError.apply({ yy }, ["Se esperaba la palabra clave 'Int'.", _$[$0]]);
 break;
 case 37:
-this.$ = ($$[$0]) ? new yy.While($$[$0-2], $$[$0]) : undefined;
+ if ($$[$0-2]) this.$ = new yy.While($$[$0-2], $$[$0]); 
 break;
 case 38: case 48: case 55:
 this.$ = addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", _$[$0]]);
@@ -183,7 +186,7 @@ case 39:
 this.$ = addError.apply({ yy }, ["Se esperaba un parentesis de apertura, un operador aritmetico, un operador de comparacion o un operador logico.", _$[$0]]);
 break;
 case 42: case 49:
-this.$ = ($$[$0-1]) ? new yy.If($$[$0-3], $$[$0-1], $$[$0]) : undefined;
+ if ($$[$0-3]) this.$ = new yy.If($$[$0-3], $$[$0-1], $$[$0]); 
 break;
 case 43: case 50:
 this.$ = addError.apply({ yy }, ["Se esperaba un signo de dos puntos.", _$[$0-1]]);
@@ -197,17 +200,17 @@ break;
 case 46: case 53:
 this.$ = addError.apply({ yy }, ["Se esperaba un parentesis de apertura.", _$[$0-1]]);
 break;
-case 47: case 54: case 60: case 69: case 73: case 75: case 109:
+case 47: case 54: case 60: case 69: case 73: case 109:
 this.$ = $$[$0];
 break;
 case 56: case 59: case 63: case 66: case 88:
 this.$ = $$[$0-1];
 break;
 case 57: case 64:
-this.$ = addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", _$[$0]]);
+this.$ = []; addError.apply({ yy }, ["Se esperaba un nivel mas de identacion.", _$[$0]]);
 break;
 case 58: case 65:
-this.$ = addError.apply({ yy }, ["Se esperaba un salto de linea.", _$[$0]]);
+this.$ = []; addError.apply({ yy }, ["Se esperaba un salto de linea.", _$[$0]]);
 break;
 case 61: case 70:
 this.$ = addError.apply({ yy }, ["Se esperaba un signo igual o un parentesis de apertura.", _$[$0]]);
@@ -225,10 +228,13 @@ case 71:
 this.$ = addError.apply({ yy }, ["Se esperaba 'Para', 'Mientras', 'Si', 'Retorno', 'Detener', 'Continuar', un identificador o un tipo.", _$[$0]]);
 break;
 case 72:
-this.$ = new yy.Declare({ type: $$[$0-2].type, names: [$$[$0-2].name].concat($$[$0-1]), value: $$[$0] }, _$[$0-2].first_column + 1, _$[$0-2].first_line);
+ if ($$[$0-2]) this.$ = new yy.Declare({ type: $$[$0-2].type, names: [$$[$0-2].name].concat($$[$0-1] || []), value: $$[$0] }, _$[$0-2].first_column + 1, _$[$0-2].first_line); 
+break;
+case 75:
+ if ($$[$0]) this.$ = $$[$0]; 
 break;
 case 77:
-this.$ = new yy.Assign($$[$0-2], $$[$0], _$[$0-2].first_column + 1, _$[$0-2].first_line);
+ if ($$[$0]) this.$ = new yy.Assign($$[$0-2], $$[$0], _$[$0-2].first_column + 1, _$[$0-2].first_line); 
 break;
 case 79:
 this.$ = {type: $$[$0-1], name: $$[$0]};
@@ -242,7 +248,13 @@ break;
 case 83:
 this.$ = addError.apply({ yy }, ["Se esperaba un parentesis de cierre o una lista de expresiones o valores.", _$[$0]]);
 break;
-case 86:
+case 84:
+this.$ = $$[$0-2]; if ($$[$0]) $$[$0-2].push($$[$0]);
+break;
+case 85:
+this.$ = $$[$0] ? [$$[$0]] : [];
+break;
+case 86: case 111: case 112: case 113: case 114: case 115: case 116: case 124: case 125: case 126:
 this.$ = $$[$0-2]; addError.apply({ yy }, ["Se esperaba una expresion o un valor.", _$[$0]]);
 break;
 case 87:
@@ -346,6 +358,9 @@ this.$ = [];
 break;
 case 141: case 143: case 145: case 149: case 151: case 155: case 157: case 161: case 189: case 195: case 200: case 206: case 208: case 210: case 215:
 $$[$0-1].push($$[$0]);
+break;
+case 142: case 148: case 150: case 154: case 160: case 188: case 194: case 199: case 205: case 207: case 209:
+this.$ = [$$[$0]];
 break;
 }
 },
@@ -1081,9 +1096,9 @@ case 56:this.popState();
 break;
 case 57:return 110;
 break;
-case 58:addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, yy_.yylloc, 0]);
+case 58:this.popState(); addError.apply(this, [`Se ingreso un salto de linea antes de cerrar el string.`, yy_.yylloc, 0]);
 break;
-case 59:addError.apply(this, [`No se cerro la especificacion del string.`, yy_.yylloc, 0]); addDedents(0, 'EOF');
+case 59:this.popState(); addError.apply(this, [`No se cerro la especificacion del string.`, yy_.yylloc, 0]); addDedents(0, 'EOF');
 break;
 case 60:return 113;
 break;
